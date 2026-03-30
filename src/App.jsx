@@ -31,6 +31,15 @@ const PROJECTS = [
   },
   {
     id: 2,
+    title: "Rising Bakery",
+    description: "E-commerce completo para una pastelería con carrito de compras, pasarelas de pago (tarjeta y OXXO), diseño de pasteles personalizados, gestión de pedidos y catálogo dinámico de productos.",
+    tags: ["React", "Node.js", "Stripe", "Pasarelas de Pago", "E-commerce"],
+    color: "#e11d48",
+    year: "2024",
+    link: "https://risingbakery-production.up.railway.app/",
+  },
+  {
+    id: 3,
     title: "Synthwave Studio",
     description: "Entorno de programación creativa para arte generativo con renderizado WebGL y colaboración en tiempo real.",
     tags: ["Three.js", "WebGL", "TypeScript", "WebSocket"],
@@ -39,7 +48,7 @@ const PROJECTS = [
     link: null,
   },
   {
-    id: 3,
+    id: 4,
     title: "Arcane Commerce",
     description: "Plataforma de e-commerce headless con renderizado edge ultra-rápido y experiencias de compra personalizadas.",
     tags: ["Next.js", "Stripe", "Tailwind", "Redis"],
@@ -48,7 +57,7 @@ const PROJECTS = [
     link: null,
   },
   {
-    id: 4,
+    id: 5,
     title: "Pulse Messenger",
     description: "App de mensajería con cifrado de extremo a extremo, canales efímeros y temas de interfaz adaptativos.",
     tags: ["React Native", "Firebase", "E2EE", "Zustand"],
