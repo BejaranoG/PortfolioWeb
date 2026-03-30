@@ -2,53 +2,59 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Github, Linkedin, Mail, ExternalLink, ArrowUpRight, ChevronDown } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════
-   DESIGN SYSTEM
-   Premium dark portfolio with luminous cyan accent,
-   distinctive typography (Syne + DM Sans).
+   DESIGN SYSTEM — Light premium palette
+   Warm off-white base, deep charcoal text, teal accent.
+   Typography: Syne (display) + DM Sans (body).
    ═══════════════════════════════════════════════════════ */
 
-const ACCENT = "#00e0c6";
-const ACCENT_DIM = "rgba(0,224,198,0.15)";
-const BG = "#060608";
-const SURFACE = "#0e0e12";
-const SURFACE_HOVER = "#14141a";
-const TEXT = "#e8e8ed";
-const TEXT_DIM = "#6b6b78";
-const BORDER = "rgba(255,255,255,0.06)";
+const ACCENT = "#0d9488";
+const ACCENT_LIGHT = "rgba(13,148,136,0.08)";
+const ACCENT_MID = "rgba(13,148,136,0.15)";
+const BG = "#fafaf9";
+const SURFACE = "#ffffff";
+const SURFACE_HOVER = "#f5f5f4";
+const TEXT = "#1c1917";
+const TEXT_DIM = "#78716c";
+const BORDER = "rgba(0,0,0,0.06)";
+const BORDER_HOVER = "rgba(13,148,136,0.25)";
 
-// ─── Datos Placeholder ───────────────────────────────
+// ─── Datos de Proyectos ──────────────────────────────
 const PROJECTS = [
   {
     id: 1,
-    title: "Nebula Dashboard",
-    description: "Plataforma de analítica en tiempo real con insights impulsados por IA y motor de visualización de datos interactivo.",
-    tags: ["React", "D3.js", "Node.js", "PostgreSQL"],
-    color: "#00e0c6",
-    year: "2025",
+    title: "NorthServices MXL",
+    description: "Landing page promocional para un SaaS enfocado en clínicas y consultorios médicos. Facilita la gestión de citas, pacientes, facturación y administración integral del consultorio.",
+    tags: ["React", "Tailwind CSS", "Landing Page", "SaaS"],
+    color: "#0d9488",
+    year: "2024",
+    link: "https://northservicesmxl.netlify.app",
   },
   {
     id: 2,
     title: "Synthwave Studio",
     description: "Entorno de programación creativa para arte generativo con renderizado WebGL y colaboración en tiempo real.",
     tags: ["Three.js", "WebGL", "TypeScript", "WebSocket"],
-    color: "#a78bfa",
-    year: "2025",
+    color: "#7c3aed",
+    year: "2024",
+    link: null,
   },
   {
     id: 3,
     title: "Arcane Commerce",
     description: "Plataforma de e-commerce headless con renderizado edge ultra-rápido y experiencias de compra personalizadas.",
     tags: ["Next.js", "Stripe", "Tailwind", "Redis"],
-    color: "#f59e0b",
+    color: "#d97706",
     year: "2024",
+    link: null,
   },
   {
     id: 4,
     title: "Pulse Messenger",
     description: "App de mensajería con cifrado de extremo a extremo, canales efímeros y temas de interfaz adaptativos.",
     tags: ["React Native", "Firebase", "E2EE", "Zustand"],
-    color: "#f472b6",
+    color: "#db2777",
     year: "2024",
+    link: null,
   },
 ];
 
@@ -71,7 +77,12 @@ const TECHNOLOGIES = [
   { name: "Vite", category: "Herramientas" },
 ];
 
-// ─── Custom Hook: Intersection Observer (scroll reveal) ─
+/* ═══════════════════════════════════════════════════════
+   SCROLL REVEAL HOOKS
+   Individual element observation for staggered entrance
+   ═══════════════════════════════════════════════════════ */
+
+// Observe a single element — triggers once
 function useReveal(threshold = 0.15) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -79,8 +90,10 @@ function useReveal(threshold = 0.15) {
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); } },
-      { threshold }
+      ([entry]) => {
+        if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); }
+      },
+      { threshold, rootMargin: "0px 0px -60px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -88,8 +101,8 @@ function useReveal(threshold = 0.15) {
   return [ref, visible];
 }
 
-// ─── Custom Hook: Staggered Reveal for lists ──────────
-function useStaggerReveal(count, threshold = 0.1) {
+// Staggered reveal for child items in a container
+function useStaggerReveal(count, threshold = 0.08) {
   const containerRef = useRef(null);
   const [visibleItems, setVisibleItems] = useState(new Set());
   useEffect(() => {
@@ -99,12 +112,12 @@ function useStaggerReveal(count, threshold = 0.1) {
       ([entry]) => {
         if (entry.isIntersecting) {
           for (let i = 0; i < count; i++) {
-            setTimeout(() => setVisibleItems((prev) => new Set([...prev, i])), i * 80);
+            setTimeout(() => setVisibleItems((prev) => new Set([...prev, i])), i * 90);
           }
           obs.unobserve(el);
         }
       },
-      { threshold }
+      { threshold, rootMargin: "0px 0px -40px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -113,36 +126,31 @@ function useStaggerReveal(count, threshold = 0.1) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   ANIMATED BACKGROUND — floating gradient orbs
+   ANIMATED BACKGROUND — soft gradient orbs
    ═══════════════════════════════════════════════════════ */
 function AnimatedBackground() {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none" }}>
       <div style={{
-        position: "absolute", inset: 0, opacity: 0.03,
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-        backgroundSize: "128px 128px",
+        position: "absolute", top: "-25%", right: "-15%", width: "55vw", height: "55vw",
+        borderRadius: "50%", background: "radial-gradient(circle, rgba(13,148,136,0.05) 0%, transparent 65%)",
+        animation: "floatOrb1 28s ease-in-out infinite",
       }} />
       <div style={{
-        position: "absolute", top: "-20%", right: "-10%", width: "60vw", height: "60vw",
-        borderRadius: "50%", background: `radial-gradient(circle, ${ACCENT}08 0%, transparent 65%)`,
-        animation: "floatOrb1 25s ease-in-out infinite",
-      }} />
-      <div style={{
-        position: "absolute", bottom: "-30%", left: "-15%", width: "50vw", height: "50vw",
-        borderRadius: "50%", background: "radial-gradient(circle, rgba(167,139,250,0.04) 0%, transparent 65%)",
-        animation: "floatOrb2 30s ease-in-out infinite",
+        position: "absolute", bottom: "-25%", left: "-10%", width: "50vw", height: "50vw",
+        borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.03) 0%, transparent 65%)",
+        animation: "floatOrb2 32s ease-in-out infinite",
       }} />
       <style>{`
-        @keyframes floatOrb1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-40px,60px) scale(1.1); } }
-        @keyframes floatOrb2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(50px,-40px) scale(1.05); } }
+        @keyframes floatOrb1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-30px,50px) scale(1.08); } }
+        @keyframes floatOrb2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,-30px) scale(1.05); } }
       `}</style>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   NAVIGATION — minimal floating nav
+   NAVIGATION — floating glass nav
    ═══════════════════════════════════════════════════════ */
 function Navigation({ activeSection }) {
   const [scrolled, setScrolled] = useState(false);
@@ -166,9 +174,10 @@ function Navigation({ activeSection }) {
     <nav style={{
       position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 1000,
       display: "flex", gap: 4, padding: "6px 8px", borderRadius: 50,
-      background: scrolled ? "rgba(6,6,8,0.85)" : "transparent",
+      background: scrolled ? "rgba(255,255,255,0.82)" : "transparent",
       backdropFilter: scrolled ? "blur(20px) saturate(1.4)" : "none",
       border: scrolled ? `1px solid ${BORDER}` : "1px solid transparent",
+      boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.06)" : "none",
       transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)",
     }}>
       {links.map((l) => {
@@ -179,7 +188,7 @@ function Navigation({ activeSection }) {
               padding: "8px 20px", borderRadius: 50, border: "none", cursor: "pointer",
               fontSize: 13, fontWeight: 500, letterSpacing: "0.02em",
               fontFamily: "'DM Sans', sans-serif",
-              background: isActive ? ACCENT_DIM : "transparent",
+              background: isActive ? ACCENT_LIGHT : "transparent",
               color: isActive ? ACCENT : TEXT_DIM,
               transition: "all 0.3s ease",
             }}
@@ -195,7 +204,7 @@ function Navigation({ activeSection }) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   HERO SECTION
+   HERO SECTION — cascading entrance
    ═══════════════════════════════════════════════════════ */
 function Hero() {
   const [loaded, setLoaded] = useState(false);
@@ -211,10 +220,12 @@ function Hero() {
       justifyContent: "center", alignItems: "center", position: "relative",
       padding: "0 24px", textAlign: "center",
     }}>
+      {/* Status badge */}
       <div style={{
         display: "inline-flex", alignItems: "center", gap: 8,
         padding: "6px 16px 6px 12px", borderRadius: 50,
         border: `1px solid ${BORDER}`, marginBottom: 32,
+        background: SURFACE,
         opacity: loaded ? 1 : 0, transform: loaded ? "translateY(0)" : "translateY(20px)",
         transition: "all 0.8s cubic-bezier(0.4,0,0.2,1) 0.2s",
       }}>
@@ -228,6 +239,7 @@ function Hero() {
         </span>
       </div>
 
+      {/* Main heading */}
       <h1 style={{
         fontSize: "clamp(2.8rem, 8vw, 7rem)", fontWeight: 700,
         fontFamily: "'Syne', sans-serif", lineHeight: 1.05, color: TEXT,
@@ -240,6 +252,7 @@ function Hero() {
         <span style={{ color: ACCENT }}>Digitales</span>
       </h1>
 
+      {/* Subtitle */}
       <p style={{
         fontSize: "clamp(1rem, 2vw, 1.2rem)", color: TEXT_DIM,
         fontFamily: "'DM Sans', sans-serif", maxWidth: 540,
@@ -250,6 +263,7 @@ function Hero() {
         Desarrollador full-stack enfocado en construir aplicaciones web hermosas, eficientes y centradas en el usuario.
       </p>
 
+      {/* Scroll indicator */}
       <button onClick={scrollDown} style={{
         position: "absolute", bottom: 48, border: "none", background: "transparent",
         cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
@@ -273,7 +287,7 @@ function Hero() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION HEADER
+   SECTION HEADER — animated label + title
    ═══════════════════════════════════════════════════════ */
 function SectionHeader({ label, title, visible, refProp }) {
   return (
@@ -302,22 +316,42 @@ function SectionHeader({ label, title, visible, refProp }) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   PROJECT CARD — 3D tilt effect on hover
+   PROJECT CARD — individual scroll reveal + 3D tilt
+   Each card has its own IntersectionObserver
    ═══════════════════════════════════════════════════════ */
-function ProjectCard({ project, index, visible }) {
+function ProjectCard({ project, index }) {
   const cardRef = useRef(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  // Per-card scroll reveal
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); }
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -80px 0px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const handleMouseMove = useCallback((e) => {
     const rect = cardRef.current?.getBoundingClientRect();
     if (!rect) return;
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ x: y * -12, y: x * 12 });
+    setTilt({ x: y * -10, y: x * 10 });
   }, []);
 
   const handleMouseLeave = () => { setTilt({ x: 0, y: 0 }); setHovered(false); };
+
+  const handleClick = () => {
+    if (project.link) window.open(project.link, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div
@@ -325,43 +359,64 @@ function ProjectCard({ project, index, visible }) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
       style={{
         position: "relative", borderRadius: 20, overflow: "hidden",
-        background: SURFACE, border: `1px solid ${BORDER}`,
+        background: SURFACE,
+        border: `1px solid ${hovered ? BORDER_HOVER : BORDER}`,
         transform: visible
           ? `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${hovered ? 1.02 : 1})`
-          : "translateY(60px)",
+          : `translateY(70px) scale(0.96)`,
         opacity: visible ? 1 : 0,
         transition: visible
-          ? "transform 0.2s ease-out, opacity 0.6s ease, box-shadow 0.3s ease"
-          : `opacity 0.7s ease ${index * 0.15}s, transform 0.7s cubic-bezier(0.4,0,0.2,1) ${index * 0.15}s`,
-        cursor: "pointer",
-        boxShadow: hovered ? `0 20px 60px -15px ${project.color}18, 0 0 0 1px ${project.color}20` : "none",
+          ? "transform 0.2s ease-out, opacity 0.6s ease, box-shadow 0.3s ease, border-color 0.3s"
+          : `opacity 0.8s cubic-bezier(0.4,0,0.2,1) ${index * 0.12}s, transform 0.8s cubic-bezier(0.4,0,0.2,1) ${index * 0.12}s`,
+        cursor: project.link ? "pointer" : "default",
+        boxShadow: hovered
+          ? `0 20px 60px -15px ${project.color}20, 0 0 0 1px ${project.color}15`
+          : "0 2px 12px rgba(0,0,0,0.04)",
         willChange: "transform, opacity",
       }}
     >
+      {/* Top accent line */}
       <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: 1,
-        background: hovered ? `linear-gradient(90deg, transparent, ${project.color}60, transparent)` : "transparent",
+        position: "absolute", top: 0, left: 0, right: 0, height: 2,
+        background: hovered
+          ? `linear-gradient(90deg, transparent, ${project.color}, transparent)`
+          : `linear-gradient(90deg, transparent, ${project.color}30, transparent)`,
         transition: "background 0.4s ease",
       }} />
 
       <div style={{ padding: "32px 28px" }}>
-        <span style={{
-          fontSize: 11, color: project.color, fontFamily: "'DM Sans', sans-serif",
-          letterSpacing: "0.08em", fontWeight: 600, textTransform: "uppercase", opacity: 0.8,
-        }}>
-          {project.year}
-        </span>
+        {/* Year + Live badge */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+          <span style={{
+            fontSize: 11, color: project.color, fontFamily: "'DM Sans', sans-serif",
+            letterSpacing: "0.08em", fontWeight: 600, textTransform: "uppercase", opacity: 0.9,
+          }}>
+            {project.year}
+          </span>
+          {project.link && (
+            <span style={{
+              fontSize: 10, color: ACCENT, fontFamily: "'DM Sans', sans-serif",
+              padding: "2px 8px", borderRadius: 50, background: ACCENT_LIGHT,
+              fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase",
+            }}>
+              En vivo
+            </span>
+          )}
+        </div>
 
+        {/* Title */}
         <h3 style={{
           fontSize: "clamp(1.3rem, 2.5vw, 1.6rem)", fontWeight: 700,
           fontFamily: "'Syne', sans-serif", color: TEXT,
-          margin: "12px 0 10px", letterSpacing: "-0.02em",
+          margin: "0 0 10px", letterSpacing: "-0.02em",
         }}>
           {project.title}
         </h3>
 
+        {/* Description */}
         <p style={{
           fontSize: 14, color: TEXT_DIM, lineHeight: 1.65,
           fontFamily: "'DM Sans', sans-serif", margin: "0 0 20px",
@@ -369,6 +424,7 @@ function ProjectCard({ project, index, visible }) {
           {project.description}
         </p>
 
+        {/* Tags */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 24 }}>
           {project.tags.map((tag) => (
             <span key={tag} style={{
@@ -383,12 +439,13 @@ function ProjectCard({ project, index, visible }) {
           ))}
         </div>
 
+        {/* CTA */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{
             fontSize: 13, fontWeight: 600, color: hovered ? project.color : TEXT_DIM,
             fontFamily: "'DM Sans', sans-serif", transition: "color 0.3s",
           }}>
-            Ver Proyecto
+            {project.link ? "Ver Proyecto" : "Próximamente"}
           </span>
           <ArrowUpRight size={14} color={hovered ? project.color : TEXT_DIM}
             style={{ transition: "color 0.3s, transform 0.3s", transform: hovered ? "translate(2px,-2px)" : "none" }}
@@ -403,7 +460,7 @@ function ProjectCard({ project, index, visible }) {
    PORTFOLIO SECTION
    ═══════════════════════════════════════════════════════ */
 function PortfolioSection() {
-  const [ref, visible] = useReveal(0.08);
+  const [ref, visible] = useReveal(0.05);
 
   return (
     <section id="portfolio" style={{ padding: "120px 24px 80px", maxWidth: 1100, margin: "0 auto" }}>
@@ -414,7 +471,7 @@ function PortfolioSection() {
         gap: 24, marginTop: 56,
       }}>
         {PROJECTS.map((p, i) => (
-          <ProjectCard key={p.id} project={p} index={i} visible={visible} />
+          <ProjectCard key={p.id} project={p} index={i} />
         ))}
       </div>
     </section>
@@ -422,7 +479,7 @@ function PortfolioSection() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   TECH PILL
+   TECH PILL — stagger-revealed on scroll
    ═══════════════════════════════════════════════════════ */
 function TechPill({ tech, index, visible }) {
   const [hovered, setHovered] = useState(false);
@@ -435,12 +492,12 @@ function TechPill({ tech, index, visible }) {
         display: "inline-flex", alignItems: "center", gap: 10,
         padding: "14px 24px", borderRadius: 60,
         background: hovered ? SURFACE_HOVER : SURFACE,
-        border: `1px solid ${hovered ? `${ACCENT}30` : BORDER}`,
+        border: `1px solid ${hovered ? BORDER_HOVER : BORDER}`,
         cursor: "default",
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0) scale(1)" : "translateY(24px) scale(0.95)",
-        transition: `all 0.5s cubic-bezier(0.4,0,0.2,1) ${index * 0.05}s, background 0.25s, border-color 0.25s`,
-        boxShadow: hovered ? `0 8px 32px -8px ${ACCENT}15` : "none",
+        transform: visible ? "translateY(0) scale(1)" : "translateY(28px) scale(0.92)",
+        transition: `opacity 0.5s cubic-bezier(0.4,0,0.2,1) ${index * 0.05}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${index * 0.05}s, background 0.25s, border-color 0.25s, box-shadow 0.25s`,
+        boxShadow: hovered ? `0 8px 24px -8px ${ACCENT}18` : "0 1px 4px rgba(0,0,0,0.03)",
       }}
     >
       <span style={{
@@ -466,7 +523,7 @@ function TechPill({ tech, index, visible }) {
    ═══════════════════════════════════════════════════════ */
 function TechnologiesSection() {
   const [headerRef, headerVisible] = useReveal(0.15);
-  const [pillsRef, visiblePills] = useStaggerReveal(TECHNOLOGIES.length, 0.1);
+  const [pillsRef, visiblePills] = useStaggerReveal(TECHNOLOGIES.length, 0.08);
 
   return (
     <section id="technologies" style={{ padding: "100px 24px 80px", maxWidth: 1100, margin: "0 auto" }}>
@@ -494,7 +551,7 @@ function TechnologiesSection() {
    ═══════════════════════════════════════════════════════ */
 function ContactSection() {
   const [ref, visible] = useReveal(0.1);
-  const [linkRef, visibleLinks] = useStaggerReveal(3, 0.15);
+  const [linkRef, visibleLinks] = useStaggerReveal(3, 0.12);
 
   const socials = [
     { icon: Mail, label: "hello@yourdomain.com", href: "mailto:hello@yourdomain.com" },
@@ -543,8 +600,8 @@ function ContactLink({ social, index, visible }) {
         padding: "24px 0", borderBottom: `1px solid ${BORDER}`,
         textDecoration: "none",
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateX(0)" : "translateX(-30px)",
-        transition: `all 0.6s cubic-bezier(0.4,0,0.2,1) ${index * 0.1}s, padding 0.3s`,
+        transform: visible ? "translateX(0)" : "translateX(-40px)",
+        transition: `all 0.7s cubic-bezier(0.4,0,0.2,1) ${index * 0.12}s, padding 0.3s`,
         paddingLeft: hovered ? 12 : 0,
       }}
     >
@@ -568,16 +625,20 @@ function ContactLink({ social, index, visible }) {
    FOOTER
    ═══════════════════════════════════════════════════════ */
 function Footer() {
+  const [ref, visible] = useReveal(0.2);
   return (
-    <footer style={{
+    <footer ref={ref} style={{
       padding: "48px 24px", textAlign: "center",
       borderTop: `1px solid ${BORDER}`,
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(20px)",
+      transition: "all 0.8s ease",
     }}>
       <p style={{
         fontSize: 12, color: TEXT_DIM,
         fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.04em",
       }}>
-        © 2026 — Diseñado y desarrollado con precisión
+        © 2024 — Diseñado y desarrollado con precisión
       </p>
     </footer>
   );
@@ -617,11 +678,11 @@ export default function App() {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body { background: ${BG}; }
-        ::selection { background: ${ACCENT}30; color: ${TEXT}; }
+        ::selection { background: ${ACCENT_MID}; color: ${TEXT}; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: ${BG}; }
-        ::-webkit-scrollbar-thumb { background: ${ACCENT}25; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: ${ACCENT}40; }
+        ::-webkit-scrollbar-thumb { background: rgba(13,148,136,0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(13,148,136,0.35); }
       `}</style>
 
       <AnimatedBackground />
