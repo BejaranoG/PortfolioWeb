@@ -1,108 +1,211 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Github, Linkedin, Mail, ExternalLink, ArrowUpRight, ChevronDown } from "lucide-react";
+import { Linkedin, Mail, ExternalLink, ArrowRight, ArrowUpRight } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════
-   DESIGN SYSTEM — Light premium palette
-   Warm off-white base, deep charcoal text, teal accent.
-   Typography: Syne (display) + DM Sans (body).
+   DESIGN SYSTEM — Futuristic Noir
+   Deep dark base with warm amber + electric violet
+   dual-accent system. Heavy use of CSS animations,
+   animated gradients, and creative visual effects.
+   Fonts: Outfit (display) + Manrope (body) + JetBrains Mono (code)
    ═══════════════════════════════════════════════════════ */
 
-const ACCENT = "#0d9488";
-const ACCENT_LIGHT = "rgba(13,148,136,0.08)";
-const ACCENT_MID = "rgba(13,148,136,0.15)";
-const BG = "#fafaf9";
-const SURFACE = "#ffffff";
-const SURFACE_HOVER = "#f5f5f4";
-const TEXT = "#1c1917";
-const TEXT_DIM = "#78716c";
-const BORDER = "rgba(0,0,0,0.06)";
-const BORDER_HOVER = "rgba(13,148,136,0.25)";
+/* ── Global CSS with keyframe animations ───────────────
+   All major animations are pure CSS for performance.
+   ──────────────────────────────────────────────────── */
+const GLOBAL_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-// ─── Datos de Proyectos ──────────────────────────────
+  :root {
+    --bg: #08080c;
+    --bg2: #0f0f15;
+    --surface: #13131a;
+    --surface-hover: #1a1a24;
+    --text: #eeeef0;
+    --text-dim: #6e6e82;
+    --text-muted: #3e3e52;
+    --amber: #f59e0b;
+    --violet: #8b5cf6;
+    --rose: #f43f5e;
+    --cyan: #06b6d4;
+    --border: rgba(255,255,255,0.06);
+    --gradient-1: linear-gradient(135deg, #f59e0b, #f43f5e, #8b5cf6);
+    --gradient-2: linear-gradient(135deg, #8b5cf6, #06b6d4, #f59e0b);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); overflow-x: hidden; }
+  ::selection { background: rgba(139,92,246,0.3); color: var(--text); }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.25); border-radius: 3px; }
+
+  /* ── Aurora Background ──────────────────────── */
+  @keyframes aurora {
+    0%   { background-position: 0% 50%, 100% 50%, 50% 0%; }
+    25%  { background-position: 100% 0%, 0% 100%, 50% 50%; }
+    50%  { background-position: 100% 50%, 0% 50%, 50% 100%; }
+    75%  { background-position: 0% 100%, 100% 0%, 50% 50%; }
+    100% { background-position: 0% 50%, 100% 50%, 50% 0%; }
+  }
+
+  /* ── Floating animation ─────────────────────── */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-12px) rotate(1deg); }
+    66% { transform: translateY(6px) rotate(-1deg); }
+  }
+
+  /* ── Gradient text shimmer ──────────────────── */
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  /* ── Rotating border gradient ───────────────── */
+  @keyframes rotateBorder {
+    0% { --angle: 0deg; }
+    100% { --angle: 360deg; }
+  }
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  /* ── Pulse ring ─────────────────────────────── */
+  @keyframes pulseRing {
+    0% { transform: scale(1); opacity: 0.4; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  /* ── Slide in from various directions ───────── */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(60px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideLeft {
+    from { opacity: 0; transform: translateX(60px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fadeScale {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── Grain overlay ──────────────────────────── */
+  @keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -10%); }
+    20% { transform: translate(-15%, 5%); }
+    30% { transform: translate(7%, -25%); }
+    40% { transform: translate(-5%, 25%); }
+    50% { transform: translate(-15%, 10%); }
+    60% { transform: translate(15%, 0%); }
+    70% { transform: translate(0%, 15%); }
+    80% { transform: translate(3%, 35%); }
+    90% { transform: translate(-10%, 10%); }
+  }
+
+  /* ── Marquee ────────────────────────────────── */
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── Glow pulse ─────────────────────────────── */
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.15), 0 0 60px rgba(139,92,246,0.05); }
+    50% { box-shadow: 0 0 30px rgba(139,92,246,0.25), 0 0 80px rgba(139,92,246,0.1); }
+  }
+
+  /* ── Line draw ──────────────────────────────── */
+  @keyframes drawLine {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  /* ── Orbit tech pills ───────────────────────── */
+  @keyframes orbit1 { 0% { transform: rotate(0deg) translateX(var(--orbit-r)) rotate(0deg); } 100% { transform: rotate(360deg) translateX(var(--orbit-r)) rotate(-360deg); } }
+  @keyframes orbit2 { 0% { transform: rotate(120deg) translateX(var(--orbit-r)) rotate(-120deg); } 100% { transform: rotate(480deg) translateX(var(--orbit-r)) rotate(-480deg); } }
+`;
+
+// ─── Project Data ────────────────────────────────────
 const PROJECTS = [
   {
     id: 1,
     title: "NorthServices MXL",
     description: "Landing page promocional para un SaaS enfocado en clínicas y consultorios médicos. Facilita la gestión de citas, pacientes, facturación y administración integral del consultorio.",
     tags: ["React", "Tailwind CSS", "Landing Page", "SaaS"],
-    color: "#0d9488",
+    accent: "var(--amber)",
     year: "2024",
     link: "https://northservicesmxl.netlify.app",
+    num: "01",
   },
   {
     id: 2,
     title: "Rising Bakery",
-    description: "E-commerce completo para una pastelería con carrito de compras, pasarelas de pago (tarjeta y OXXO), diseño de pasteles personalizados, gestión de pedidos y catálogo dinámico de productos.",
+    description: "E-commerce completo para una pastelería con carrito de compras, pasarelas de pago (tarjeta y OXXO), diseño de pasteles personalizados, gestión de pedidos y catálogo dinámico.",
     tags: ["React", "Node.js", "Stripe", "Pasarelas de Pago", "E-commerce"],
-    color: "#e11d48",
+    accent: "var(--rose)",
     year: "2024",
     link: "https://risingbakery-production.up.railway.app/",
+    num: "02",
   },
   {
     id: 3,
     title: "Synthwave Studio",
     description: "Entorno de programación creativa para arte generativo con renderizado WebGL y colaboración en tiempo real.",
     tags: ["Three.js", "WebGL", "TypeScript", "WebSocket"],
-    color: "#7c3aed",
+    accent: "var(--violet)",
     year: "2024",
     link: null,
+    num: "03",
   },
   {
     id: 4,
     title: "Arcane Commerce",
     description: "Plataforma de e-commerce headless con renderizado edge ultra-rápido y experiencias de compra personalizadas.",
     tags: ["Next.js", "Stripe", "Tailwind", "Redis"],
-    color: "#d97706",
+    accent: "var(--cyan)",
     year: "2024",
     link: null,
-  },
-  {
-    id: 5,
-    title: "Pulse Messenger",
-    description: "App de mensajería con cifrado de extremo a extremo, canales efímeros y temas de interfaz adaptativos.",
-    tags: ["React Native", "Firebase", "E2EE", "Zustand"],
-    color: "#db2777",
-    year: "2024",
-    link: null,
+    num: "04",
   },
 ];
 
 const TECHNOLOGIES = [
-  { name: "React", category: "Frontend" },
-  { name: "TypeScript", category: "Lenguaje" },
-  { name: "Next.js", category: "Framework" },
-  { name: "Node.js", category: "Backend" },
-  { name: "Tailwind CSS", category: "Estilos" },
-  { name: "PostgreSQL", category: "Base de datos" },
-  { name: "Three.js", category: "3D / WebGL" },
-  { name: "GraphQL", category: "API" },
-  { name: "Docker", category: "DevOps" },
-  { name: "Figma", category: "Diseño" },
-  { name: "Redis", category: "Caché" },
-  { name: "Python", category: "Lenguaje" },
-  { name: "AWS", category: "Nube" },
-  { name: "Git", category: "Herramientas" },
-  { name: "Framer Motion", category: "Animación" },
-  { name: "Vite", category: "Herramientas" },
+  { name: "React", cat: "Frontend", icon: "⚛" },
+  { name: "TypeScript", cat: "Lenguaje", icon: "TS" },
+  { name: "Next.js", cat: "Framework", icon: "▲" },
+  { name: "Node.js", cat: "Backend", icon: "⬢" },
+  { name: "Tailwind", cat: "Estilos", icon: "🎨" },
+  { name: "PostgreSQL", cat: "DB", icon: "🐘" },
+  { name: "Three.js", cat: "3D", icon: "🌐" },
+  { name: "GraphQL", cat: "API", icon: "◈" },
+  { name: "Docker", cat: "DevOps", icon: "🐳" },
+  { name: "Figma", cat: "Diseño", icon: "🎯" },
+  { name: "Python", cat: "Lenguaje", icon: "🐍" },
+  { name: "AWS", cat: "Nube", icon: "☁" },
+  { name: "Git", cat: "Control", icon: "⑂" },
+  { name: "Redis", cat: "Caché", icon: "⚡" },
+  { name: "Vite", cat: "Build", icon: "⚡" },
+  { name: "Stripe", cat: "Pagos", icon: "💳" },
 ];
 
 /* ═══════════════════════════════════════════════════════
-   SCROLL REVEAL HOOKS
-   Individual element observation for staggered entrance
+   HOOKS
    ═══════════════════════════════════════════════════════ */
-
-// Observe a single element — triggers once
-function useReveal(threshold = 0.15) {
+function useReveal(threshold = 0.12) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); }
-      },
-      { threshold, rootMargin: "0px 0px -60px 0px" }
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.unobserve(el); } },
+      { threshold, rootMargin: "0px 0px -50px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -110,19 +213,17 @@ function useReveal(threshold = 0.15) {
   return [ref, visible];
 }
 
-// Staggered reveal for child items in a container
-function useStaggerReveal(count, threshold = 0.08) {
-  const containerRef = useRef(null);
-  const [visibleItems, setVisibleItems] = useState(new Set());
+function useStagger(count, threshold = 0.08) {
+  const ref = useRef(null);
+  const [items, setItems] = useState(new Set());
   useEffect(() => {
-    const el = containerRef.current;
+    const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          for (let i = 0; i < count; i++) {
-            setTimeout(() => setVisibleItems((prev) => new Set([...prev, i])), i * 90);
-          }
+      ([e]) => {
+        if (e.isIntersecting) {
+          for (let i = 0; i < count; i++)
+            setTimeout(() => setItems(p => new Set([...p, i])), i * 100);
           obs.unobserve(el);
         }
       },
@@ -131,40 +232,100 @@ function useStaggerReveal(count, threshold = 0.08) {
     obs.observe(el);
     return () => obs.disconnect();
   }, [count, threshold]);
-  return [containerRef, visibleItems];
+  return [ref, items];
+}
+
+function useMouse() {
+  const pos = useRef({ x: 0, y: 0 });
+  const [, forceUpdate] = useState(0);
+  useEffect(() => {
+    let ticking = false;
+    const handler = (e) => {
+      pos.current = { x: e.clientX, y: e.clientY };
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => { forceUpdate(n => n + 1); ticking = false; });
+      }
+    };
+    window.addEventListener("mousemove", handler, { passive: true });
+    return () => window.removeEventListener("mousemove", handler);
+  }, []);
+  return pos.current;
 }
 
 /* ═══════════════════════════════════════════════════════
-   ANIMATED BACKGROUND — soft gradient orbs
+   AURORA BACKGROUND + GRAIN
+   Multi-layered animated gradient background with
+   film grain overlay for texture.
    ═══════════════════════════════════════════════════════ */
-function AnimatedBackground() {
+function AuroraBackground({ mouse }) {
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+      {/* Aurora gradients */}
       <div style={{
-        position: "absolute", top: "-25%", right: "-15%", width: "55vw", height: "55vw",
-        borderRadius: "50%", background: "radial-gradient(circle, rgba(13,148,136,0.05) 0%, transparent 65%)",
-        animation: "floatOrb1 28s ease-in-out infinite",
+        position: "absolute", inset: 0, opacity: 0.4,
+        background: [
+          "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139,92,246,0.3), transparent)",
+          "radial-gradient(ellipse 60% 40% at 80% 50%, rgba(245,158,11,0.15), transparent)",
+          "radial-gradient(ellipse 50% 60% at 20% 80%, rgba(6,182,212,0.12), transparent)",
+        ].join(", "),
+        animation: "aurora 20s ease-in-out infinite",
+        backgroundSize: "200% 200%, 200% 200%, 200% 200%",
       }} />
+      {/* Mouse-following spotlight */}
       <div style={{
-        position: "absolute", bottom: "-25%", left: "-10%", width: "50vw", height: "50vw",
-        borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.03) 0%, transparent 65%)",
-        animation: "floatOrb2 32s ease-in-out infinite",
+        position: "absolute",
+        left: mouse.x - 300,
+        top: mouse.y - 300,
+        width: 600,
+        height: 600,
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(139,92,246,0.08) 0%, rgba(245,158,11,0.04) 40%, transparent 70%)",
+        transition: "left 0.3s ease-out, top 0.3s ease-out",
+        willChange: "left, top",
       }} />
-      <style>{`
-        @keyframes floatOrb1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-30px,50px) scale(1.08); } }
-        @keyframes floatOrb2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,-30px) scale(1.05); } }
-      `}</style>
+      {/* Grain overlay */}
+      <div style={{
+        position: "absolute", inset: "-200%", opacity: 0.025,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        backgroundSize: "128px 128px",
+        animation: "grain 8s steps(10) infinite",
+      }} />
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   NAVIGATION — floating glass nav
+   SCROLL PROGRESS BAR
+   Thin animated gradient line at the top of the page
    ═══════════════════════════════════════════════════════ */
-function Navigation({ activeSection }) {
+function ScrollProgress() {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const handler = () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(h > 0 ? (window.scrollY / h) * 100 : 0);
+    };
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+  return (
+    <div style={{
+      position: "fixed", top: 0, left: 0, zIndex: 9999,
+      height: 2, width: `${progress}%`,
+      background: "var(--gradient-1)",
+      transition: "width 0.1s linear",
+    }} />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   NAVIGATION — glass morphism with animated indicator
+   ═══════════════════════════════════════════════════════ */
+function Navigation({ active }) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 60);
+    const h = () => setScrolled(window.scrollY > 80);
     window.addEventListener("scroll", h, { passive: true });
     return () => window.removeEventListener("scroll", h);
   }, []);
@@ -175,34 +336,34 @@ function Navigation({ activeSection }) {
     { label: "Contacto", id: "contact" },
   ];
 
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <nav style={{
-      position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 1000,
-      display: "flex", gap: 4, padding: "6px 8px", borderRadius: 50,
-      background: scrolled ? "rgba(255,255,255,0.82)" : "transparent",
-      backdropFilter: scrolled ? "blur(20px) saturate(1.4)" : "none",
-      border: scrolled ? `1px solid ${BORDER}` : "1px solid transparent",
-      boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.06)" : "none",
-      transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)",
+      position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 1000,
+      display: "flex", gap: 2, padding: "5px 6px", borderRadius: 50,
+      background: scrolled ? "rgba(8,8,12,0.8)" : "rgba(8,8,12,0.4)",
+      backdropFilter: "blur(24px) saturate(1.5)",
+      border: `1px solid ${scrolled ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)"}`,
+      boxShadow: scrolled ? "0 8px 32px rgba(0,0,0,0.4)" : "none",
+      transition: "all 0.6s cubic-bezier(0.4,0,0.2,1)",
     }}>
       {links.map((l) => {
-        const isActive = activeSection === l.id;
+        const isActive = active === l.id;
         return (
-          <button key={l.id} onClick={() => scrollTo(l.id)}
+          <button key={l.id}
+            onClick={() => document.getElementById(l.id)?.scrollIntoView({ behavior: "smooth" })}
             style={{
-              padding: "8px 20px", borderRadius: 50, border: "none", cursor: "pointer",
-              fontSize: 13, fontWeight: 500, letterSpacing: "0.02em",
-              fontFamily: "'DM Sans', sans-serif",
-              background: isActive ? ACCENT_LIGHT : "transparent",
-              color: isActive ? ACCENT : TEXT_DIM,
-              transition: "all 0.3s ease",
+              padding: "10px 22px", borderRadius: 50, border: "none", cursor: "pointer",
+              fontSize: 13, fontWeight: 600, letterSpacing: "0.02em",
+              fontFamily: "'Manrope', sans-serif",
+              background: isActive
+                ? "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(139,92,246,0.15))"
+                : "transparent",
+              color: isActive ? "var(--text)" : "var(--text-dim)",
+              transition: "all 0.35s ease",
+              position: "relative",
             }}
-            onMouseEnter={(e) => { if (!isActive) e.target.style.color = TEXT; }}
-            onMouseLeave={(e) => { if (!isActive) e.target.style.color = TEXT_DIM; }}
+            onMouseEnter={(e) => { if (!isActive) e.target.style.color = "var(--text)"; }}
+            onMouseLeave={(e) => { if (!isActive) e.target.style.color = "var(--text-dim)"; }}
           >
             {l.label}
           </button>
@@ -213,222 +374,281 @@ function Navigation({ activeSection }) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   HERO SECTION — cascading entrance
+   ANIMATED TEXT — letter-by-letter reveal with gradient
+   ═══════════════════════════════════════════════════════ */
+function AnimatedHeading({ text, gradient, delay = 0, loaded }) {
+  return (
+    <span style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", gap: "0 0.22em" }}>
+      {text.split("").map((char, i) => (
+        <span key={i} style={{
+          display: char === " " ? "inline" : "inline-block",
+          opacity: loaded ? 1 : 0,
+          transform: loaded ? "translateY(0) rotateX(0)" : "translateY(50px) rotateX(-40deg)",
+          transition: `all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay + i * 0.035}s`,
+          background: gradient ? "var(--gradient-1)" : "none",
+          WebkitBackgroundClip: gradient ? "text" : "unset",
+          WebkitTextFillColor: gradient ? "transparent" : "var(--text)",
+          backgroundSize: gradient ? "200% auto" : "auto",
+          animation: gradient && loaded ? "shimmer 4s linear infinite" : "none",
+          animationDelay: `${delay + 1}s`,
+        }}>
+          {char === " " ? "\u00A0" : char}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   HERO SECTION — dramatic multi-layer entrance
    ═══════════════════════════════════════════════════════ */
 function Hero() {
   const [loaded, setLoaded] = useState(false);
-  useEffect(() => { setTimeout(() => setLoaded(true), 100); }, []);
-
-  const scrollDown = () => {
-    document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth" });
-  };
+  useEffect(() => { setTimeout(() => setLoaded(true), 200); }, []);
 
   return (
     <section style={{
       minHeight: "100vh", display: "flex", flexDirection: "column",
       justifyContent: "center", alignItems: "center", position: "relative",
-      padding: "0 24px", textAlign: "center",
+      padding: "0 24px", textAlign: "center", overflow: "hidden",
     }}>
-      {/* Status badge */}
+      {/* Decorative rings */}
       <div style={{
-        display: "inline-flex", alignItems: "center", gap: 8,
-        padding: "6px 16px 6px 12px", borderRadius: 50,
-        border: `1px solid ${BORDER}`, marginBottom: 32,
-        background: SURFACE,
-        opacity: loaded ? 1 : 0, transform: loaded ? "translateY(0)" : "translateY(20px)",
-        transition: "all 0.8s cubic-bezier(0.4,0,0.2,1) 0.2s",
-      }}>
-        <span style={{
-          width: 7, height: 7, borderRadius: "50%", background: ACCENT,
-          boxShadow: `0 0 8px ${ACCENT}80`,
-          animation: "pulse 2s ease-in-out infinite",
-        }} />
-        <span style={{ fontSize: 12, color: TEXT_DIM, fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.04em" }}>
-          Disponible para trabajar
-        </span>
-      </div>
+        position: "absolute", width: "min(700px, 90vw)", height: "min(700px, 90vw)",
+        borderRadius: "50%", border: "1px solid rgba(139,92,246,0.06)",
+        opacity: loaded ? 1 : 0, transition: "opacity 2s ease 0.5s",
+      }} />
+      <div style={{
+        position: "absolute", width: "min(500px, 70vw)", height: "min(500px, 70vw)",
+        borderRadius: "50%", border: "1px solid rgba(245,158,11,0.06)",
+        opacity: loaded ? 1 : 0, transition: "opacity 2s ease 0.8s",
+      }} />
 
-      {/* Main heading */}
+      {/* Main heading — animated letter reveal */}
       <h1 style={{
-        fontSize: "clamp(2.8rem, 8vw, 7rem)", fontWeight: 700,
-        fontFamily: "'Syne', sans-serif", lineHeight: 1.05, color: TEXT,
-        margin: 0, letterSpacing: "-0.03em",
-        opacity: loaded ? 1 : 0, transform: loaded ? "translateY(0)" : "translateY(40px)",
-        transition: "all 1s cubic-bezier(0.4,0,0.2,1) 0.4s",
+        fontSize: "clamp(2.6rem, 9vw, 7.5rem)", fontWeight: 900,
+        fontFamily: "'Outfit', sans-serif", lineHeight: 1,
+        letterSpacing: "-0.04em", margin: 0,
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 0,
       }}>
-        Creando Experiencias
-        <br />
-        <span style={{ color: ACCENT }}>Digitales</span>
+        <AnimatedHeading text="Creando" delay={0.1} loaded={loaded} />
+        <AnimatedHeading text="Experiencias" delay={0.4} loaded={loaded} gradient />
+        <AnimatedHeading text="Digitales" delay={0.8} loaded={loaded} />
       </h1>
 
-      {/* Subtitle */}
-      <p style={{
-        fontSize: "clamp(1rem, 2vw, 1.2rem)", color: TEXT_DIM,
-        fontFamily: "'DM Sans', sans-serif", maxWidth: 540,
-        lineHeight: 1.7, margin: "28px 0 0", fontWeight: 400,
-        opacity: loaded ? 1 : 0, transform: loaded ? "translateY(0)" : "translateY(30px)",
-        transition: "all 1s cubic-bezier(0.4,0,0.2,1) 0.7s",
+      {/* Subtitle with line reveal */}
+      <div style={{
+        position: "relative", marginTop: 36, maxWidth: 560,
+        opacity: loaded ? 1 : 0,
+        transform: loaded ? "translateY(0)" : "translateY(30px)",
+        transition: "all 1s cubic-bezier(0.4,0,0.2,1) 1.4s",
       }}>
-        Desarrollador full-stack enfocado en construir aplicaciones web hermosas, eficientes y centradas en el usuario.
-      </p>
+        {/* Decorative line above subtitle */}
+        <div style={{
+          width: loaded ? 60 : 0, height: 2, margin: "0 auto 20px",
+          background: "var(--gradient-1)", borderRadius: 2,
+          transition: "width 0.8s ease 1.6s",
+        }} />
+        <p style={{
+          fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", color: "var(--text-dim)",
+          fontFamily: "'Manrope', sans-serif", lineHeight: 1.8, fontWeight: 400,
+        }}>
+          Desarrollamos soluciones digitales a medida que impulsan el crecimiento de tu negocio — desde plataformas web hasta sistemas integrales de gestión.
+        </p>
+      </div>
+
+      {/* CTA Button with animated gradient border */}
+      <div style={{
+        marginTop: 48,
+        opacity: loaded ? 1 : 0,
+        transform: loaded ? "translateY(0)" : "translateY(20px)",
+        transition: "all 0.8s ease 1.8s",
+      }}>
+        <button
+          onClick={() => document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth" })}
+          style={{
+            position: "relative", padding: "16px 40px", borderRadius: 50,
+            border: "none", cursor: "pointer",
+            background: "linear-gradient(135deg, rgba(245,158,11,0.12), rgba(139,92,246,0.12))",
+            color: "var(--text)", fontFamily: "'Manrope', sans-serif",
+            fontSize: 14, fontWeight: 600, letterSpacing: "0.03em",
+            display: "flex", alignItems: "center", gap: 10,
+            transition: "all 0.35s ease",
+            backdropFilter: "blur(10px)",
+            outline: "1px solid rgba(255,255,255,0.08)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "linear-gradient(135deg, rgba(245,158,11,0.2), rgba(139,92,246,0.2))";
+            e.currentTarget.style.outline = "1px solid rgba(255,255,255,0.15)";
+            e.currentTarget.style.transform = "translateY(-2px)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "linear-gradient(135deg, rgba(245,158,11,0.12), rgba(139,92,246,0.12))";
+            e.currentTarget.style.outline = "1px solid rgba(255,255,255,0.08)";
+            e.currentTarget.style.transform = "translateY(0)";
+          }}
+        >
+          Ver Proyectos <ArrowRight size={15} />
+        </button>
+      </div>
 
       {/* Scroll indicator */}
-      <button onClick={scrollDown} style={{
-        position: "absolute", bottom: 48, border: "none", background: "transparent",
-        cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-        opacity: loaded ? 0.5 : 0, transition: "all 1s ease 1.2s",
-      }}
-        onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
-        onMouseLeave={(e) => e.currentTarget.style.opacity = 0.5}
-      >
-        <span style={{ fontSize: 11, color: TEXT_DIM, fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-          Scroll
-        </span>
-        <ChevronDown size={16} color={TEXT_DIM} style={{ animation: "bobDown 2s ease-in-out infinite" }} />
-      </button>
-
-      <style>{`
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-        @keyframes bobDown { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
-      `}</style>
+      <div style={{
+        position: "absolute", bottom: 40,
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 10,
+        opacity: loaded ? 0.4 : 0, transition: "opacity 1s ease 2.2s",
+      }}>
+        <div style={{
+          width: 1, height: 40,
+          background: "linear-gradient(to bottom, var(--violet), transparent)",
+          animation: "float 3s ease-in-out infinite",
+        }} />
+      </div>
     </section>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION HEADER — animated label + title
+   MARQUEE — infinite scrolling text strip
+   Creates visual rhythm between sections
    ═══════════════════════════════════════════════════════ */
-function SectionHeader({ label, title, visible, refProp }) {
+function Marquee() {
+  const [ref, visible] = useReveal(0.1);
+  const text = "FRONTEND · BACKEND · UI/UX · E-COMMERCE · SAAS · WEB APPS · API · ";
   return (
-    <div ref={refProp} style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-      <span style={{
-        fontSize: 13, fontWeight: 600, color: ACCENT,
-        fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.04em",
-        opacity: visible ? 0.7 : 0,
-        transform: visible ? "translateX(0)" : "translateX(-20px)",
-        transition: "all 0.6s cubic-bezier(0.4,0,0.2,1)",
+    <div ref={ref} style={{
+      overflow: "hidden", padding: "28px 0",
+      borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)",
+      opacity: visible ? 1 : 0, transition: "opacity 1s ease",
+    }}>
+      <div style={{
+        display: "flex", whiteSpace: "nowrap",
+        animation: "marquee 25s linear infinite",
       }}>
-        {label}
-      </span>
-      <h2 style={{
-        fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 700,
-        fontFamily: "'Syne', sans-serif", color: TEXT,
-        margin: 0, letterSpacing: "-0.02em",
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(30px)",
-        transition: "all 0.8s cubic-bezier(0.4,0,0.2,1) 0.1s",
-      }}>
-        {title}
-      </h2>
+        {[...Array(3)].map((_, i) => (
+          <span key={i} style={{
+            fontSize: "clamp(0.75rem, 1.5vw, 0.9rem)", fontFamily: "'JetBrains Mono', monospace",
+            fontWeight: 500, color: "var(--text-muted)", letterSpacing: "0.15em",
+            paddingRight: 16,
+          }}>
+            {text}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   PROJECT CARD — individual scroll reveal + 3D tilt
-   Each card has its own IntersectionObserver
+   PROJECT CARD — animated gradient border + glass effect
+   Each card has a rotating conic-gradient border,
+   glass-morphism interior, and smooth hover transforms.
    ═══════════════════════════════════════════════════════ */
 function ProjectCard({ project, index }) {
-  const cardRef = useRef(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [hovered, setHovered] = useState(false);
+  const ref = useRef(null);
   const [visible, setVisible] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  // Per-card scroll reveal
   useEffect(() => {
-    const el = cardRef.current;
+    const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); }
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -80px 0px" }
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.unobserve(el); } },
+      { threshold: 0.1, rootMargin: "0px 0px -60px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
   const handleMouseMove = useCallback((e) => {
-    const rect = cardRef.current?.getBoundingClientRect();
+    const rect = ref.current?.getBoundingClientRect();
     if (!rect) return;
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ x: y * -10, y: x * 10 });
+    setMousePos({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
   }, []);
-
-  const handleMouseLeave = () => { setTilt({ x: 0, y: 0 }); setHovered(false); };
-
-  const handleClick = () => {
-    if (project.link) window.open(project.link, "_blank", "noopener,noreferrer");
-  };
 
   return (
     <div
-      ref={cardRef}
+      ref={ref}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => project.link && window.open(project.link, "_blank", "noopener,noreferrer")}
       style={{
-        position: "relative", borderRadius: 20, overflow: "hidden",
-        background: SURFACE,
-        border: `1px solid ${hovered ? BORDER_HOVER : BORDER}`,
-        transform: visible
-          ? `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${hovered ? 1.02 : 1})`
-          : `translateY(70px) scale(0.96)`,
+        position: "relative", borderRadius: 24, padding: 1,
+        background: hovered
+          ? `conic-gradient(from var(--angle), ${project.accent}, var(--violet), ${project.accent})`
+          : "var(--border)",
+        animation: hovered ? "rotateBorder 3s linear infinite" : "none",
         opacity: visible ? 1 : 0,
+        transform: visible
+          ? `translateY(0) scale(${hovered ? 1.02 : 1})`
+          : "translateY(80px) scale(0.94)",
         transition: visible
-          ? "transform 0.2s ease-out, opacity 0.6s ease, box-shadow 0.3s ease, border-color 0.3s"
-          : `opacity 0.8s cubic-bezier(0.4,0,0.2,1) ${index * 0.12}s, transform 0.8s cubic-bezier(0.4,0,0.2,1) ${index * 0.12}s`,
+          ? "transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.6s ease, background 0.4s"
+          : `all 0.8s cubic-bezier(0.4,0,0.2,1) ${index * 0.15}s`,
         cursor: project.link ? "pointer" : "default",
-        boxShadow: hovered
-          ? `0 20px 60px -15px ${project.color}20, 0 0 0 1px ${project.color}15`
-          : "0 2px 12px rgba(0,0,0,0.04)",
-        willChange: "transform, opacity",
       }}
     >
-      {/* Top accent line */}
+      {/* Inner card with glass effect */}
       <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: 2,
+        borderRadius: 23, padding: "36px 32px",
         background: hovered
-          ? `linear-gradient(90deg, transparent, ${project.color}, transparent)`
-          : `linear-gradient(90deg, transparent, ${project.color}30, transparent)`,
-        transition: "background 0.4s ease",
-      }} />
-
-      <div style={{ padding: "32px 28px" }}>
-        {/* Year + Live badge */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+          ? `radial-gradient(ellipse at ${mousePos.x}% ${mousePos.y}%, rgba(255,255,255,0.04), var(--surface))`
+          : "var(--surface)",
+        transition: "background 0.3s ease",
+        position: "relative", overflow: "hidden",
+      }}>
+        {/* Number + year header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <span style={{
-            fontSize: 11, color: project.color, fontFamily: "'DM Sans', sans-serif",
-            letterSpacing: "0.08em", fontWeight: 600, textTransform: "uppercase", opacity: 0.9,
+            fontSize: 48, fontWeight: 900, fontFamily: "'Outfit', sans-serif",
+            color: "rgba(255,255,255,0.03)", lineHeight: 1, letterSpacing: "-0.04em",
           }}>
-            {project.year}
+            {project.num}
           </span>
-          {project.link && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {project.link && (
+              <span style={{
+                fontSize: 10, padding: "4px 10px", borderRadius: 50,
+                background: `${project.accent}18`, color: project.accent,
+                fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+                letterSpacing: "0.06em", textTransform: "uppercase",
+              }}>
+                EN VIVO
+              </span>
+            )}
             <span style={{
-              fontSize: 10, color: ACCENT, fontFamily: "'DM Sans', sans-serif",
-              padding: "2px 8px", borderRadius: 50, background: ACCENT_LIGHT,
-              fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase",
+              fontSize: 11, color: "var(--text-muted)",
+              fontFamily: "'JetBrains Mono', monospace", fontWeight: 500,
             }}>
-              En vivo
+              {project.year}
             </span>
-          )}
+          </div>
         </div>
 
         {/* Title */}
         <h3 style={{
-          fontSize: "clamp(1.3rem, 2.5vw, 1.6rem)", fontWeight: 700,
-          fontFamily: "'Syne', sans-serif", color: TEXT,
-          margin: "0 0 10px", letterSpacing: "-0.02em",
+          fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)", fontWeight: 800,
+          fontFamily: "'Outfit', sans-serif", color: "var(--text)",
+          margin: "0 0 12px", letterSpacing: "-0.02em",
+          transition: "color 0.3s",
+          ...(hovered ? {
+            background: `linear-gradient(135deg, var(--text), ${project.accent})`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          } : {}),
         }}>
           {project.title}
         </h3>
 
         {/* Description */}
         <p style={{
-          fontSize: 14, color: TEXT_DIM, lineHeight: 1.65,
-          fontFamily: "'DM Sans', sans-serif", margin: "0 0 20px",
+          fontSize: 14, color: "var(--text-dim)", lineHeight: 1.7,
+          fontFamily: "'Manrope', sans-serif", margin: "0 0 24px",
         }}>
           {project.description}
         </p>
@@ -437,11 +657,12 @@ function ProjectCard({ project, index }) {
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 24 }}>
           {project.tags.map((tag) => (
             <span key={tag} style={{
-              padding: "4px 12px", borderRadius: 50, fontSize: 11,
-              color: TEXT_DIM, border: `1px solid ${BORDER}`,
-              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-              background: hovered ? `${project.color}08` : "transparent",
-              transition: "background 0.3s",
+              padding: "5px 14px", borderRadius: 50, fontSize: 11,
+              color: hovered ? project.accent : "var(--text-dim)",
+              border: `1px solid ${hovered ? `${project.accent}30` : "var(--border)"}`,
+              fontFamily: "'JetBrains Mono', monospace", fontWeight: 500,
+              transition: "all 0.3s",
+              background: hovered ? `${project.accent}08` : "transparent",
             }}>
               {tag}
             </span>
@@ -449,16 +670,21 @@ function ProjectCard({ project, index }) {
         </div>
 
         {/* CTA */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8,
+          color: hovered ? project.accent : "var(--text-dim)",
+          transition: "color 0.3s",
+        }}>
           <span style={{
-            fontSize: 13, fontWeight: 600, color: hovered ? project.color : TEXT_DIM,
-            fontFamily: "'DM Sans', sans-serif", transition: "color 0.3s",
+            fontSize: 13, fontWeight: 700, fontFamily: "'Manrope', sans-serif",
+            letterSpacing: "0.03em",
           }}>
             {project.link ? "Ver Proyecto" : "Próximamente"}
           </span>
-          <ArrowUpRight size={14} color={hovered ? project.color : TEXT_DIM}
-            style={{ transition: "color 0.3s, transform 0.3s", transform: hovered ? "translate(2px,-2px)" : "none" }}
-          />
+          <ArrowUpRight size={14} style={{
+            transition: "transform 0.3s",
+            transform: hovered ? "translate(3px,-3px)" : "none",
+          }} />
         </div>
       </div>
     </div>
@@ -472,12 +698,50 @@ function PortfolioSection() {
   const [ref, visible] = useReveal(0.05);
 
   return (
-    <section id="portfolio" style={{ padding: "120px 24px 80px", maxWidth: 1100, margin: "0 auto" }}>
-      <SectionHeader label="01" title="Proyectos Destacados" visible={visible} refProp={ref} />
+    <section id="portfolio" style={{ padding: "100px 24px 60px", maxWidth: 1100, margin: "0 auto" }}>
+      {/* Section label */}
+      <div ref={ref} style={{
+        display: "flex", alignItems: "center", gap: 16, marginBottom: 16,
+        opacity: visible ? 1 : 0, transform: visible ? "translateX(0)" : "translateX(-30px)",
+        transition: "all 0.7s cubic-bezier(0.4,0,0.2,1)",
+      }}>
+        <span style={{
+          fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          color: "var(--amber)", letterSpacing: "0.1em",
+        }}>
+          01
+        </span>
+        <div style={{ width: 40, height: 1, background: "var(--amber)", opacity: 0.4 }} />
+        <span style={{
+          fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 500,
+          color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase",
+        }}>
+          Proyectos
+        </span>
+      </div>
+
+      {/* Heading */}
+      <h2 style={{
+        fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900,
+        fontFamily: "'Outfit', sans-serif", color: "var(--text)",
+        margin: "0 0 60px", letterSpacing: "-0.03em", lineHeight: 1.1,
+        opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(40px)",
+        transition: "all 0.8s cubic-bezier(0.4,0,0.2,1) 0.15s",
+      }}>
+        Proyectos <br />
+        <span style={{
+          background: "var(--gradient-1)", WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        }}>
+          Destacados
+        </span>
+      </h2>
+
+      {/* Project grid */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 420px), 1fr))",
-        gap: 24, marginTop: 56,
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 460px), 1fr))",
+        gap: 20,
       }}>
         {PROJECTS.map((p, i) => (
           <ProjectCard key={p.id} project={p} index={i} />
@@ -488,9 +752,9 @@ function PortfolioSection() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   TECH PILL — stagger-revealed on scroll
+   TECH CARD — interactive pill with glow effect
    ═══════════════════════════════════════════════════════ */
-function TechPill({ tech, index, visible }) {
+function TechCard({ tech, index, visible }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -498,31 +762,45 @@ function TechPill({ tech, index, visible }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display: "inline-flex", alignItems: "center", gap: 10,
-        padding: "14px 24px", borderRadius: 60,
-        background: hovered ? SURFACE_HOVER : SURFACE,
-        border: `1px solid ${hovered ? BORDER_HOVER : BORDER}`,
+        display: "flex", alignItems: "center", gap: 14,
+        padding: "16px 24px", borderRadius: 16,
+        background: hovered ? "var(--surface-hover)" : "var(--surface)",
+        border: `1px solid ${hovered ? "rgba(139,92,246,0.2)" : "var(--border)"}`,
         cursor: "default",
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0) scale(1)" : "translateY(28px) scale(0.92)",
-        transition: `opacity 0.5s cubic-bezier(0.4,0,0.2,1) ${index * 0.05}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${index * 0.05}s, background 0.25s, border-color 0.25s, box-shadow 0.25s`,
-        boxShadow: hovered ? `0 8px 24px -8px ${ACCENT}18` : "0 1px 4px rgba(0,0,0,0.03)",
+        transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.9)",
+        transition: `opacity 0.5s ease ${index * 0.06}s, transform 0.6s cubic-bezier(0.34,1.56,0.64,1) ${index * 0.06}s, background 0.3s, border-color 0.3s, box-shadow 0.3s`,
+        boxShadow: hovered ? "0 8px 32px rgba(139,92,246,0.1)" : "none",
+        animation: hovered ? "glowPulse 2s ease-in-out infinite" : "none",
       }}
     >
-      <span style={{
-        fontSize: 15, fontWeight: 600, color: TEXT,
-        fontFamily: "'DM Sans', sans-serif",
+      {/* Icon circle */}
+      <div style={{
+        width: 36, height: 36, borderRadius: 10, display: "flex",
+        alignItems: "center", justifyContent: "center", fontSize: 16,
+        background: hovered
+          ? "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(139,92,246,0.15))"
+          : "rgba(255,255,255,0.03)",
+        transition: "all 0.3s",
+        transform: hovered ? "rotate(-5deg) scale(1.1)" : "none",
       }}>
-        {tech.name}
-      </span>
-      <span style={{
-        fontSize: 11, color: hovered ? ACCENT : TEXT_DIM,
-        fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-        opacity: hovered ? 1 : 0.6,
-        transition: "all 0.25s",
-      }}>
-        {tech.category}
-      </span>
+        {tech.icon}
+      </div>
+      <div>
+        <div style={{
+          fontSize: 14, fontWeight: 700, color: "var(--text)",
+          fontFamily: "'Outfit', sans-serif",
+        }}>
+          {tech.name}
+        </div>
+        <div style={{
+          fontSize: 11, color: hovered ? "var(--violet)" : "var(--text-muted)",
+          fontFamily: "'JetBrains Mono', monospace", fontWeight: 500,
+          transition: "color 0.3s",
+        }}>
+          {tech.cat}
+        </div>
+      </div>
     </div>
   );
 }
@@ -531,24 +809,66 @@ function TechPill({ tech, index, visible }) {
    TECHNOLOGIES SECTION
    ═══════════════════════════════════════════════════════ */
 function TechnologiesSection() {
-  const [headerRef, headerVisible] = useReveal(0.15);
-  const [pillsRef, visiblePills] = useStaggerReveal(TECHNOLOGIES.length, 0.08);
+  const [ref, visible] = useReveal(0.1);
+  const [gridRef, visibleItems] = useStagger(TECHNOLOGIES.length, 0.05);
 
   return (
-    <section id="technologies" style={{ padding: "100px 24px 80px", maxWidth: 1100, margin: "0 auto" }}>
-      <SectionHeader label="02" title="Tecnologías" visible={headerVisible} refProp={headerRef} />
+    <section id="technologies" style={{ padding: "100px 24px 60px", maxWidth: 1100, margin: "0 auto" }}>
+      {/* Section label */}
+      <div ref={ref} style={{
+        display: "flex", alignItems: "center", gap: 16, marginBottom: 16,
+        opacity: visible ? 1 : 0, transform: visible ? "translateX(0)" : "translateX(-30px)",
+        transition: "all 0.7s cubic-bezier(0.4,0,0.2,1)",
+      }}>
+        <span style={{
+          fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          color: "var(--violet)", letterSpacing: "0.1em",
+        }}>
+          02
+        </span>
+        <div style={{ width: 40, height: 1, background: "var(--violet)", opacity: 0.4 }} />
+        <span style={{
+          fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 500,
+          color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase",
+        }}>
+          Stack
+        </span>
+      </div>
+
+      <h2 style={{
+        fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900,
+        fontFamily: "'Outfit', sans-serif", color: "var(--text)",
+        margin: "0 0 16px", letterSpacing: "-0.03em", lineHeight: 1.1,
+        opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(40px)",
+        transition: "all 0.8s cubic-bezier(0.4,0,0.2,1) 0.1s",
+      }}>
+        Tecnologías <br />
+        <span style={{
+          background: "var(--gradient-2)", WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        }}>
+          & Herramientas
+        </span>
+      </h2>
+
       <p style={{
-        fontSize: 15, color: TEXT_DIM, fontFamily: "'DM Sans', sans-serif",
-        lineHeight: 1.7, maxWidth: 500, margin: "20px 0 48px",
-        opacity: headerVisible ? 1 : 0,
-        transform: headerVisible ? "translateY(0)" : "translateY(20px)",
+        fontSize: 15, color: "var(--text-dim)", fontFamily: "'Manrope', sans-serif",
+        lineHeight: 1.7, maxWidth: 480, margin: "0 0 48px",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(20px)",
         transition: "all 0.7s ease 0.3s",
       }}>
-        Herramientas y tecnologías que uso para dar vida a las ideas. Siempre explorando, siempre aprendiendo.
+        Herramientas que uso para dar vida a cada proyecto. Siempre explorando nuevas tecnologías.
       </p>
-      <div ref={pillsRef} style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+
+      {/* Tech grid */}
+      <div ref={gridRef} style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+        gap: 12,
+      }}>
         {TECHNOLOGIES.map((tech, i) => (
-          <TechPill key={tech.name} tech={tech} index={i} visible={visiblePills.has(i)} />
+          <TechCard key={tech.name} tech={tech} index={i} visible={visibleItems.has(i)} />
         ))}
       </div>
     </section>
@@ -556,38 +876,71 @@ function TechnologiesSection() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   CONTACT SECTION
+   CONTACT SECTION — with animated elements
    ═══════════════════════════════════════════════════════ */
 function ContactSection() {
   const [ref, visible] = useReveal(0.1);
-  const [linkRef, visibleLinks] = useStaggerReveal(3, 0.12);
+  const [linksRef, visibleLinks] = useStagger(2, 0.1);
 
   const socials = [
-    { icon: Mail, label: "hello@yourdomain.com", href: "mailto:hello@yourdomain.com" },
-    { icon: Github, label: "GitHub", href: "https://github.com" },
-    { icon: Linkedin, label: "LinkedIn", href: "https://linkedin.com" },
+    { icon: Mail, label: "gerardoebr29@gmail.com", href: "mailto:gerardoebr29@gmail.com", accent: "var(--amber)" },
+    { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/gerardo-bejarano-005156256/", accent: "var(--cyan)" },
   ];
 
   return (
-    <section id="contact" style={{ padding: "120px 24px 80px", maxWidth: 1100, margin: "0 auto" }}>
-      <SectionHeader label="03" title="Contacto" visible={visible} refProp={ref} />
-
-      <div style={{ marginTop: 48, display: "grid", gridTemplateColumns: "1fr", gap: 48 }}>
-        <p style={{
-          fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)", color: TEXT_DIM,
-          fontFamily: "'DM Sans', sans-serif", lineHeight: 1.75, maxWidth: 560,
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(30px)",
-          transition: "all 0.8s ease 0.2s",
+    <section id="contact" style={{ padding: "100px 24px 80px", maxWidth: 1100, margin: "0 auto" }}>
+      {/* Section label */}
+      <div ref={ref} style={{
+        display: "flex", alignItems: "center", gap: 16, marginBottom: 16,
+        opacity: visible ? 1 : 0, transform: visible ? "translateX(0)" : "translateX(-30px)",
+        transition: "all 0.7s cubic-bezier(0.4,0,0.2,1)",
+      }}>
+        <span style={{
+          fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          color: "var(--rose)", letterSpacing: "0.1em",
         }}>
-          ¿Tienes un proyecto en mente o quieres colaborar? Siempre estoy abierto a discutir nuevas ideas y oportunidades.
-        </p>
+          03
+        </span>
+        <div style={{ width: 40, height: 1, background: "var(--rose)", opacity: 0.4 }} />
+        <span style={{
+          fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 500,
+          color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase",
+        }}>
+          Contacto
+        </span>
+      </div>
 
-        <div ref={linkRef} style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-          {socials.map((s, i) => (
-            <ContactLink key={s.label} social={s} index={i} visible={visibleLinks.has(i)} />
-          ))}
-        </div>
+      <h2 style={{
+        fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900,
+        fontFamily: "'Outfit', sans-serif", color: "var(--text)",
+        margin: "0 0 16px", letterSpacing: "-0.03em", lineHeight: 1.1,
+        opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(40px)",
+        transition: "all 0.8s cubic-bezier(0.4,0,0.2,1) 0.1s",
+      }}>
+        Hablemos de tu <br />
+        <span style={{
+          background: "linear-gradient(135deg, var(--rose), var(--amber))",
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+        }}>
+          próximo proyecto
+        </span>
+      </h2>
+
+      <p style={{
+        fontSize: 15, color: "var(--text-dim)", fontFamily: "'Manrope', sans-serif",
+        lineHeight: 1.8, maxWidth: 520, margin: "0 0 48px",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(20px)",
+        transition: "all 0.8s ease 0.3s",
+      }}>
+        ¿Tienes un proyecto en mente o quieres colaborar? Siempre estoy abierto a discutir nuevas ideas y crear algo extraordinario juntos.
+      </p>
+
+      {/* Links */}
+      <div ref={linksRef} style={{ display: "flex", flexDirection: "column", gap: 0, maxWidth: 500 }}>
+        {socials.map((s, i) => (
+          <ContactLink key={s.label} social={s} index={i} visible={visibleLinks.has(i)} />
+        ))}
       </div>
     </section>
   );
@@ -599,55 +952,230 @@ function ContactLink({ social, index, visible }) {
 
   return (
     <a
-      href={social.href}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={social.href} target="_blank" rel="noopener noreferrer"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "24px 0", borderBottom: `1px solid ${BORDER}`,
+        padding: "22px 0", borderBottom: "1px solid var(--border)",
         textDecoration: "none",
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateX(0)" : "translateX(-40px)",
-        transition: `all 0.7s cubic-bezier(0.4,0,0.2,1) ${index * 0.12}s, padding 0.3s`,
-        paddingLeft: hovered ? 12 : 0,
+        transform: visible ? "translateX(0)" : "translateX(-50px)",
+        transition: `all 0.7s cubic-bezier(0.4,0,0.2,1) ${index * 0.12}s, padding-left 0.3s`,
+        paddingLeft: hovered ? 16 : 0,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <Icon size={18} color={hovered ? ACCENT : TEXT_DIM} style={{ transition: "color 0.25s" }} />
+        {/* Icon with glow ring on hover */}
+        <div style={{
+          position: "relative", width: 36, height: 36, borderRadius: 10,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          background: hovered ? `${social.accent}15` : "rgba(255,255,255,0.03)",
+          transition: "all 0.3s",
+        }}>
+          <Icon size={16} color={hovered ? social.accent : "var(--text-dim)"}
+            style={{ transition: "color 0.3s" }}
+          />
+          {hovered && (
+            <div style={{
+              position: "absolute", inset: -4, borderRadius: 14,
+              border: `1px solid ${social.accent}30`,
+              animation: "pulseRing 1.5s ease-out infinite",
+            }} />
+          )}
+        </div>
         <span style={{
-          fontSize: 16, fontWeight: 500, color: hovered ? TEXT : TEXT_DIM,
-          fontFamily: "'DM Sans', sans-serif", transition: "color 0.25s",
+          fontSize: 15, fontWeight: 600, fontFamily: "'Manrope', sans-serif",
+          color: hovered ? "var(--text)" : "var(--text-dim)",
+          transition: "color 0.3s",
         }}>
           {social.label}
         </span>
       </div>
-      <ExternalLink size={14} color={hovered ? ACCENT : TEXT_DIM}
-        style={{ transition: "color 0.25s, transform 0.25s", transform: hovered ? "translate(2px,-2px)" : "none" }}
+      <ArrowUpRight size={14} color={hovered ? social.accent : "var(--text-muted)"}
+        style={{
+          transition: "all 0.3s",
+          transform: hovered ? "translate(3px,-3px)" : "none",
+        }}
       />
     </a>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   FOOTER
+   BRAND MARK — "BejaranoG" fixed signature
+   Vertically rotated on the left edge, always visible.
+   Uses the gradient identity + subtle hover interaction.
+   On mobile, sits horizontal at top-left instead.
+   ═══════════════════════════════════════════════════════ */
+function BrandMark() {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <>
+      {/* Left vertical signature — desktop */}
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          position: "fixed",
+          left: 24,
+          top: "50%",
+          transform: "translateY(-50%) rotate(-90deg)",
+          transformOrigin: "center center",
+          zIndex: 999,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          cursor: "default",
+          transition: "opacity 0.4s ease",
+        }}
+      >
+        {/* Decorative line before */}
+        <div style={{
+          width: hovered ? 40 : 24,
+          height: 1,
+          background: hovered ? "var(--gradient-1)" : "rgba(255,255,255,0.12)",
+          transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)",
+          borderRadius: 1,
+        }} />
+
+        {/* Name */}
+        <span style={{
+          fontSize: 12,
+          fontFamily: "'Outfit', sans-serif",
+          fontWeight: 700,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)",
+          ...(hovered
+            ? {
+                background: "var(--gradient-1)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundSize: "200% auto",
+                animation: "shimmer 3s linear infinite",
+              }
+            : {
+                color: "rgba(255,255,255,0.2)",
+              }),
+        }}>
+          BejaranoG
+        </span>
+
+        {/* Decorative line after */}
+        <div style={{
+          width: hovered ? 40 : 24,
+          height: 1,
+          background: hovered ? "var(--gradient-1)" : "rgba(255,255,255,0.12)",
+          transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)",
+          borderRadius: 1,
+        }} />
+      </div>
+
+      {/* Right side — vertical "PORTFOLIO · 2024" for visual balance */}
+      <div style={{
+        position: "fixed",
+        right: 24,
+        top: "50%",
+        transform: "translateY(-50%) rotate(90deg)",
+        transformOrigin: "center center",
+        zIndex: 999,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+      }}>
+        <div style={{
+          width: 24, height: 1,
+          background: "rgba(255,255,255,0.08)",
+          borderRadius: 1,
+        }} />
+        <span style={{
+          fontSize: 10,
+          fontFamily: "'JetBrains Mono', monospace",
+          fontWeight: 500,
+          letterSpacing: "0.15em",
+          color: "rgba(255,255,255,0.1)",
+          whiteSpace: "nowrap",
+          textTransform: "uppercase",
+        }}>
+          Portfolio · 2024
+        </span>
+        <div style={{
+          width: 24, height: 1,
+          background: "rgba(255,255,255,0.08)",
+          borderRadius: 1,
+        }} />
+      </div>
+
+      {/* Hide side marks on mobile, show small top-left mark instead */}
+      <style>{`
+        @media (max-width: 768px) {
+          div[style*="rotate(-90deg)"] { display: none !important; }
+          div[style*="rotate(90deg)"] { display: none !important; }
+        }
+      `}</style>
+
+      {/* Mobile brand — top left, horizontal */}
+      <div style={{
+        position: "fixed",
+        top: 20,
+        left: 16,
+        zIndex: 999,
+        display: "none",
+      }}>
+        <span style={{
+          fontSize: 11,
+          fontFamily: "'Outfit', sans-serif",
+          fontWeight: 700,
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          background: "var(--gradient-1)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        }}>
+          BG
+        </span>
+      </div>
+      <style>{`
+        @media (max-width: 768px) {
+          div[style*="top: 20"][style*="left: 16"] { display: flex !important; }
+        }
+      `}</style>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER — with animated gradient line
    ═══════════════════════════════════════════════════════ */
 function Footer() {
   const [ref, visible] = useReveal(0.2);
   return (
-    <footer ref={ref} style={{
-      padding: "48px 24px", textAlign: "center",
-      borderTop: `1px solid ${BORDER}`,
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(20px)",
-      transition: "all 0.8s ease",
-    }}>
-      <p style={{
-        fontSize: 12, color: TEXT_DIM,
-        fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.04em",
+    <footer ref={ref} style={{ padding: "40px 24px 48px", textAlign: "center", position: "relative" }}>
+      {/* Animated gradient divider */}
+      <div style={{
+        width: visible ? "100%" : "0%", height: 1, margin: "0 auto 32px",
+        background: "var(--gradient-1)", transition: "width 1.2s ease",
+        maxWidth: 300,
+      }} />
+      {/* Brand in footer */}
+      <span style={{
+        fontSize: 18, fontFamily: "'Outfit', sans-serif", fontWeight: 800,
+        letterSpacing: "0.1em", display: "inline-block", marginBottom: 12,
+        background: "var(--gradient-1)", WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        opacity: visible ? 1 : 0, transition: "opacity 0.8s ease 0.4s",
       }}>
-        © 2024 — Diseñado y desarrollado con precisión
+        BejaranoG
+      </span>
+      <p style={{
+        fontSize: 12, color: "var(--text-muted)",
+        fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.06em",
+        opacity: visible ? 1 : 0, transition: "opacity 0.8s ease 0.6s",
+      }}>
+        © 2024 — DISEÑADO Y DESARROLLADO CON PRECISIÓN
       </p>
     </footer>
   );
@@ -657,48 +1185,33 @@ function Footer() {
    MAIN APP
    ═══════════════════════════════════════════════════════ */
 export default function App() {
-  const [activeSection, setActiveSection] = useState("portfolio");
+  const [active, setActive] = useState("portfolio");
+  const mouse = useMouse();
 
   useEffect(() => {
-    const sections = ["portfolio", "technologies", "contact"];
+    const ids = ["portfolio", "technologies", "contact"];
     const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        });
-      },
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); }),
       { threshold: 0.3 }
     );
-    sections.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
+    ids.forEach((id) => { const el = document.getElementById(id); if (el) obs.observe(el); });
     return () => obs.disconnect();
   }, []);
 
   return (
     <div style={{
-      background: BG, minHeight: "100vh", color: TEXT,
-      fontFamily: "'DM Sans', sans-serif",
-      overflowX: "hidden", position: "relative",
+      background: "var(--bg)", minHeight: "100vh", color: "var(--text)",
+      fontFamily: "'Manrope', sans-serif", overflowX: "hidden", position: "relative",
     }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        body { background: ${BG}; }
-        ::selection { background: ${ACCENT_MID}; color: ${TEXT}; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: ${BG}; }
-        ::-webkit-scrollbar-thumb { background: rgba(13,148,136,0.2); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(13,148,136,0.35); }
-      `}</style>
-
-      <AnimatedBackground />
-      <Navigation activeSection={activeSection} />
+      <style>{GLOBAL_CSS}</style>
+      <AuroraBackground mouse={mouse} />
+      <ScrollProgress />
+      <Navigation active={active} />
+      <BrandMark />
 
       <main style={{ position: "relative", zIndex: 1 }}>
         <Hero />
+        <Marquee />
         <PortfolioSection />
         <TechnologiesSection />
         <ContactSection />
