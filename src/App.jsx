@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 <<<<<<< HEAD
 import { Linkedin, Mail, ExternalLink, ArrowRight, ArrowUpRight } from "lucide-react";
+=======
+import { Github, Linkedin, Mail, ExternalLink, ArrowRight, ArrowUpRight, ChevronDown, MousePointer2 } from "lucide-react";
+>>>>>>> 7e2db378b5e18e899bea5c8ef450f5f651f6b2a9
 
 /* ═══════════════════════════════════════════════════════
    DESIGN SYSTEM — Futuristic Noir
@@ -887,6 +890,14 @@ function ContactSection() {
   const socials = [
     { icon: Mail, label: "gerardoebr29@gmail.com", href: "mailto:gerardoebr29@gmail.com", accent: "var(--amber)" },
     { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/gerardo-bejarano-005156256/", accent: "var(--cyan)" },
+=======
+  const [linksRef, visibleLinks] = useStagger(3, 0.1);
+
+  const socials = [
+    { icon: Mail, label: "hello@yourdomain.com", href: "mailto:hello@yourdomain.com", accent: "var(--amber)" },
+    { icon: Github, label: "GitHub", href: "https://github.com", accent: "var(--violet)" },
+    { icon: Linkedin, label: "LinkedIn", href: "https://linkedin.com", accent: "var(--cyan)" },
+>>>>>>> 7e2db378b5e18e899bea5c8ef450f5f651f6b2a9
   ];
 
   return (
