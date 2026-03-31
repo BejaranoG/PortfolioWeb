@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+<<<<<<< HEAD
 import { Linkedin, Mail, ExternalLink, ArrowRight, ArrowUpRight } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════
@@ -880,6 +881,7 @@ function TechnologiesSection() {
    ═══════════════════════════════════════════════════════ */
 function ContactSection() {
   const [ref, visible] = useReveal(0.1);
+<<<<<<< HEAD
   const [linksRef, visibleLinks] = useStagger(2, 0.1);
 
   const socials = [
