@@ -135,26 +135,118 @@ function useStaggerReveal(count, threshold = 0.08) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   ANIMATED BACKGROUND — soft gradient orbs
+   INTERACTIVE BACKGROUND — Canvas dot grid reacting to mouse
+   Uses requestAnimationFrame + canvas for smooth 60fps.
+   Dots near the cursor glow and expand; a soft radial
+   gradient follows the pointer for ambient light effect.
    ═══════════════════════════════════════════════════════ */
-function AnimatedBackground() {
+function InteractiveBackground() {
+  const canvasRef = useRef(null);
+  const mouse = useRef({ x: -500, y: -500 });
+  const animRef = useRef(null);
+  const dotsRef = useRef([]);
+  const isTouch = useRef(false);
+
+  useEffect(() => {
+    isTouch.current = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.scale(dpr, dpr);
+      buildGrid();
+    };
+
+    const SPACING = 48;
+    const BASE_RADIUS = 1.2;
+    const MAX_RADIUS = 3.5;
+    const INFLUENCE = 160;
+
+    function buildGrid() {
+      const dots = [];
+      const cols = Math.ceil(window.innerWidth / SPACING) + 1;
+      const rows = Math.ceil(window.innerHeight / SPACING) + 1;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          dots.push({ x: c * SPACING, y: r * SPACING });
+        }
+      }
+      dotsRef.current = dots;
+    }
+
+    const handleMouse = (e) => {
+      mouse.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const draw = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      const mx = mouse.current.x;
+      const my = mouse.current.y;
+
+      // Ambient glow following cursor
+      if (!isTouch.current && mx > 0 && my > 0) {
+        const grd = ctx.createRadialGradient(mx, my, 0, mx, my, 280);
+        grd.addColorStop(0, "rgba(13,148,136,0.06)");
+        grd.addColorStop(0.5, "rgba(13,148,136,0.02)");
+        grd.addColorStop(1, "transparent");
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      // Dots
+      const dots = dotsRef.current;
+      for (let i = 0; i < dots.length; i++) {
+        const d = dots[i];
+        const dx = d.x - mx;
+        const dy = d.y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const t = Math.max(0, 1 - dist / INFLUENCE);
+        const radius = BASE_RADIUS + (MAX_RADIUS - BASE_RADIUS) * t * t;
+        const alpha = 0.12 + 0.45 * t * t;
+
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = t > 0.01
+          ? `rgba(13,148,136,${alpha})`
+          : "rgba(0,0,0,0.07)";
+        ctx.fill();
+      }
+
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    window.addEventListener("mousemove", handleMouse, { passive: true });
+    animRef.current = requestAnimationFrame(draw);
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", handleMouse);
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, []);
+
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none" }}>
-      <div style={{
-        position: "absolute", top: "-25%", right: "-15%", width: "55vw", height: "55vw",
-        borderRadius: "50%", background: "radial-gradient(circle, rgba(13,148,136,0.05) 0%, transparent 65%)",
-        animation: "floatOrb1 28s ease-in-out infinite",
-      }} />
-      <div style={{
-        position: "absolute", bottom: "-25%", left: "-10%", width: "50vw", height: "50vw",
-        borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.03) 0%, transparent 65%)",
-        animation: "floatOrb2 32s ease-in-out infinite",
-      }} />
-      <style>{`
-        @keyframes floatOrb1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-30px,50px) scale(1.08); } }
-        @keyframes floatOrb2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,-30px) scale(1.05); } }
-      `}</style>
-    </div>
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "fixed", inset: 0, zIndex: 0,
+        pointerEvents: "none",
+      }}
+    />
   );
 }
 
@@ -229,32 +321,13 @@ function Hero() {
       justifyContent: "center", alignItems: "center", position: "relative",
       padding: "0 24px", textAlign: "center",
     }}>
-      {/* Status badge */}
-      <div style={{
-        display: "inline-flex", alignItems: "center", gap: 8,
-        padding: "6px 16px 6px 12px", borderRadius: 50,
-        border: `1px solid ${BORDER}`, marginBottom: 32,
-        background: SURFACE,
-        opacity: loaded ? 1 : 0, transform: loaded ? "translateY(0)" : "translateY(20px)",
-        transition: "all 0.8s cubic-bezier(0.4,0,0.2,1) 0.2s",
-      }}>
-        <span style={{
-          width: 7, height: 7, borderRadius: "50%", background: ACCENT,
-          boxShadow: `0 0 8px ${ACCENT}80`,
-          animation: "pulse 2s ease-in-out infinite",
-        }} />
-        <span style={{ fontSize: 12, color: TEXT_DIM, fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.04em" }}>
-          Disponible para trabajar
-        </span>
-      </div>
-
       {/* Main heading */}
       <h1 style={{
         fontSize: "clamp(2.8rem, 8vw, 7rem)", fontWeight: 700,
         fontFamily: "'Syne', sans-serif", lineHeight: 1.05, color: TEXT,
         margin: 0, letterSpacing: "-0.03em",
         opacity: loaded ? 1 : 0, transform: loaded ? "translateY(0)" : "translateY(40px)",
-        transition: "all 1s cubic-bezier(0.4,0,0.2,1) 0.4s",
+        transition: "all 1s cubic-bezier(0.4,0,0.2,1) 0.2s",
       }}>
         Creando Experiencias
         <br />
@@ -264,19 +337,19 @@ function Hero() {
       {/* Subtitle */}
       <p style={{
         fontSize: "clamp(1rem, 2vw, 1.2rem)", color: TEXT_DIM,
-        fontFamily: "'DM Sans', sans-serif", maxWidth: 540,
+        fontFamily: "'DM Sans', sans-serif", maxWidth: 600,
         lineHeight: 1.7, margin: "28px 0 0", fontWeight: 400,
         opacity: loaded ? 1 : 0, transform: loaded ? "translateY(0)" : "translateY(30px)",
-        transition: "all 1s cubic-bezier(0.4,0,0.2,1) 0.7s",
+        transition: "all 1s cubic-bezier(0.4,0,0.2,1) 0.5s",
       }}>
-        Desarrollador full-stack enfocado en construir aplicaciones web hermosas, eficientes y centradas en el usuario.
+        Desarrollamos soluciones digitales a medida que impulsan el crecimiento de tu negocio — desde plataformas web hasta sistemas integrales de gestión.
       </p>
 
       {/* Scroll indicator */}
       <button onClick={scrollDown} style={{
         position: "absolute", bottom: 48, border: "none", background: "transparent",
         cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-        opacity: loaded ? 0.5 : 0, transition: "all 1s ease 1.2s",
+        opacity: loaded ? 0.5 : 0, transition: "all 1s ease 1s",
       }}
         onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
         onMouseLeave={(e) => e.currentTarget.style.opacity = 0.5}
@@ -288,7 +361,6 @@ function Hero() {
       </button>
 
       <style>{`
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
         @keyframes bobDown { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
       `}</style>
     </section>
@@ -694,7 +766,7 @@ export default function App() {
         ::-webkit-scrollbar-thumb:hover { background: rgba(13,148,136,0.35); }
       `}</style>
 
-      <AnimatedBackground />
+      <InteractiveBackground />
       <Navigation activeSection={activeSection} />
 
       <main style={{ position: "relative", zIndex: 1 }}>
