@@ -1004,22 +1004,177 @@ function ContactLink({ social, index, visible }) {
 }
 
 /* ═══════════════════════════════════════════════════════
+   BRAND MARK — "BejaranoG" fixed signature
+   Vertically rotated on the left edge, always visible.
+   Uses the gradient identity + subtle hover interaction.
+   On mobile, sits horizontal at top-left instead.
+   ═══════════════════════════════════════════════════════ */
+function BrandMark() {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <>
+      {/* Left vertical signature — desktop */}
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          position: "fixed",
+          left: 24,
+          top: "50%",
+          transform: "translateY(-50%) rotate(-90deg)",
+          transformOrigin: "center center",
+          zIndex: 999,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          cursor: "default",
+          transition: "opacity 0.4s ease",
+        }}
+      >
+        {/* Decorative line before */}
+        <div style={{
+          width: hovered ? 40 : 24,
+          height: 1,
+          background: hovered ? "var(--gradient-1)" : "rgba(255,255,255,0.12)",
+          transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)",
+          borderRadius: 1,
+        }} />
+
+        {/* Name */}
+        <span style={{
+          fontSize: 12,
+          fontFamily: "'Outfit', sans-serif",
+          fontWeight: 700,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)",
+          ...(hovered
+            ? {
+                background: "var(--gradient-1)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundSize: "200% auto",
+                animation: "shimmer 3s linear infinite",
+              }
+            : {
+                color: "rgba(255,255,255,0.2)",
+              }),
+        }}>
+          BejaranoG
+        </span>
+
+        {/* Decorative line after */}
+        <div style={{
+          width: hovered ? 40 : 24,
+          height: 1,
+          background: hovered ? "var(--gradient-1)" : "rgba(255,255,255,0.12)",
+          transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)",
+          borderRadius: 1,
+        }} />
+      </div>
+
+      {/* Right side — vertical "PORTFOLIO · 2024" for visual balance */}
+      <div style={{
+        position: "fixed",
+        right: 24,
+        top: "50%",
+        transform: "translateY(-50%) rotate(90deg)",
+        transformOrigin: "center center",
+        zIndex: 999,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+      }}>
+        <div style={{
+          width: 24, height: 1,
+          background: "rgba(255,255,255,0.08)",
+          borderRadius: 1,
+        }} />
+        <span style={{
+          fontSize: 10,
+          fontFamily: "'JetBrains Mono', monospace",
+          fontWeight: 500,
+          letterSpacing: "0.15em",
+          color: "rgba(255,255,255,0.1)",
+          whiteSpace: "nowrap",
+          textTransform: "uppercase",
+        }}>
+          Portfolio · 2024
+        </span>
+        <div style={{
+          width: 24, height: 1,
+          background: "rgba(255,255,255,0.08)",
+          borderRadius: 1,
+        }} />
+      </div>
+
+      {/* Hide side marks on mobile, show small top-left mark instead */}
+      <style>{`
+        @media (max-width: 768px) {
+          div[style*="rotate(-90deg)"] { display: none !important; }
+          div[style*="rotate(90deg)"] { display: none !important; }
+        }
+      `}</style>
+
+      {/* Mobile brand — top left, horizontal */}
+      <div style={{
+        position: "fixed",
+        top: 20,
+        left: 16,
+        zIndex: 999,
+        display: "none",
+      }}>
+        <span style={{
+          fontSize: 11,
+          fontFamily: "'Outfit', sans-serif",
+          fontWeight: 700,
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          background: "var(--gradient-1)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        }}>
+          BG
+        </span>
+      </div>
+      <style>{`
+        @media (max-width: 768px) {
+          div[style*="top: 20"][style*="left: 16"] { display: flex !important; }
+        }
+      `}</style>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
    FOOTER — with animated gradient line
    ═══════════════════════════════════════════════════════ */
 function Footer() {
   const [ref, visible] = useReveal(0.2);
   return (
-    <footer ref={ref} style={{ padding: "40px 24px", textAlign: "center", position: "relative" }}>
+    <footer ref={ref} style={{ padding: "40px 24px 48px", textAlign: "center", position: "relative" }}>
       {/* Animated gradient divider */}
       <div style={{
         width: visible ? "100%" : "0%", height: 1, margin: "0 auto 32px",
         background: "var(--gradient-1)", transition: "width 1.2s ease",
         maxWidth: 300,
       }} />
+      {/* Brand in footer */}
+      <span style={{
+        fontSize: 18, fontFamily: "'Outfit', sans-serif", fontWeight: 800,
+        letterSpacing: "0.1em", display: "inline-block", marginBottom: 12,
+        background: "var(--gradient-1)", WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        opacity: visible ? 1 : 0, transition: "opacity 0.8s ease 0.4s",
+      }}>
+        BejaranoG
+      </span>
       <p style={{
         fontSize: 12, color: "var(--text-muted)",
         fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.06em",
-        opacity: visible ? 1 : 0, transition: "opacity 0.8s ease 0.3s",
+        opacity: visible ? 1 : 0, transition: "opacity 0.8s ease 0.6s",
       }}>
         © 2024 — DISEÑADO Y DESARROLLADO CON PRECISIÓN
       </p>
@@ -1053,6 +1208,7 @@ export default function App() {
       <AuroraBackground mouse={mouse} />
       <ScrollProgress />
       <Navigation active={active} />
+      <BrandMark />
 
       <main style={{ position: "relative", zIndex: 1 }}>
         <Hero />
