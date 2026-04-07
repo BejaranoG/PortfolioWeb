@@ -139,7 +139,7 @@ const PROJECTS = [
     description: "Landing page promocional para un SaaS enfocado en clínicas y consultorios médicos. Facilita la gestión de citas, pacientes, facturación y administración integral del consultorio.",
     tags: ["React", "Tailwind CSS", "Landing Page", "SaaS"],
     accent: "var(--amber)",
-    year: "2024",
+    year: "2022",
     link: "https://northservicesmxl.netlify.app",
     num: "01",
   },
@@ -155,11 +155,11 @@ const PROJECTS = [
   },
   {
     id: 3,
-    title: "Proaktiva Bros",
+    title: "Office Bros",
     description: "Videojuego estilo 32-bit basado en una financiera donde enfrentas enemigos que representan instituciones de autoridad. Incluye múltiples niveles, mecánicas de combate y una narrativa satírica del sistema financiero.",
     tags: ["JavaScript", "Canvas", "Game Dev", "Pixel Art", "32-bit"],
     accent: "var(--violet)",
-    year: "2024",
+    year: "2025",
     link: "https://proaktivabros-production.up.railway.app/",
     num: "03",
   },
@@ -169,7 +169,7 @@ const PROJECTS = [
     description: "Visualizador interactivo de rotación planetaria que simula los movimientos orbitales de los planetas alrededor del Sol, permitiendo entender la proporción de velocidad de cada uno en tiempo real.",
     tags: ["Three.js", "WebGL", "3D", "Simulación", "Astronomía"],
     accent: "var(--cyan)",
-    year: "2024",
+    year: "2023",
     link: "https://planetshow-production.up.railway.app/",
     num: "04",
   },
@@ -454,7 +454,7 @@ function Hero() {
           fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", color: "var(--text-dim)",
           fontFamily: "'Manrope', sans-serif", lineHeight: 1.8, fontWeight: 400,
         }}>
-          Desarrollamos soluciones digitales a medida que impulsan el crecimiento de tu negocio — desde plataformas web hasta sistemas integrales de gestión.
+          Administrador de Empresas con enfoque en análisis de datos, desarrollo web y optimización de procesos — buscando aportar valor a equipos que apuestan por la innovación.
         </p>
       </div>
 
@@ -517,8 +517,8 @@ function AboutSection() {
   const [ref, visible] = useReveal(0.05);
   const [statsRef, statsVisible] = useStagger(4, 0.1);
   const [expRef, expVisible] = useStagger(3, 0.08);
-  const [eduRef, eduVisible] = useStagger(4, 0.08);
-  const [toolsRef, toolsVisible] = useStagger(6, 0.06);
+  const [eduRef, eduVisible] = useStagger(3, 0.08);
+  const [toolsRef, toolsVisible] = useStagger(7, 0.06);
 
   const stats = [
     { num: "+3", label: "Años de experiencia" },
@@ -552,14 +552,13 @@ function AboutSection() {
   ];
 
   const education = [
-    { title: "Ing. Desarrollo de Software", school: "Universidad Tecmilenio", year: "2025 — Cursando", accent: "var(--amber)" },
-    { title: "Diplomado Business Intelligence", school: "Cetys Universidad", year: "2025", accent: "var(--violet)" },
+    { title: "Diplomado Business Intelligence", school: "Cetys Universidad", year: "2025", accent: "var(--amber)" },
     { title: "Diplomado Gestión Logística", school: "Universidad Vizcaya de las Américas", year: "2022", accent: "var(--cyan)" },
     { title: "Lic. Admón. de Empresas", school: "Universidad Vizcaya de las Américas", year: "2018 — 2021", accent: "var(--rose)" },
   ];
 
   const tools = [
-    "Power BI", "SQL", "Excel Avanzado", "Google Looker Studio", "VBA / Macros", "Google Notebook",
+    "Power BI", "SQL", "Excel Avanzado", "Google Looker Studio", "VBA / Macros", "Google Notebook", "Claude Prompting",
   ];
 
   return (
@@ -605,9 +604,9 @@ function AboutSection() {
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)",
         transition: "all 0.8s ease 0.25s",
       }}>
-        Administrador de Empresas con formación en Ingeniería de Software, bases de datos y ciencia de datos. 
-        Integro la gestión empresarial con herramientas avanzadas para tomar decisiones basadas en datos, 
-        optimizar procesos y desarrollar soluciones digitales que generan impacto real.
+        Administrador de Empresas con especialización en análisis de datos, Business Intelligence y desarrollo web. 
+        Combino visión estratégica de negocio con habilidades técnicas para optimizar procesos, generar reportes 
+        clave y construir herramientas digitales que resuelven problemas reales dentro de las organizaciones.
       </p>
 
       {/* ── Stats Strip ────────────────────────────── */}
@@ -1263,12 +1262,12 @@ function ContactSection() {
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(40px)",
         transition: "all 0.8s cubic-bezier(0.4,0,0.2,1) 0.1s",
       }}>
-        Hablemos de tu <br />
+        Hablemos sobre <br />
         <span style={{
           background: "linear-gradient(135deg, var(--rose), var(--amber))",
           WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
         }}>
-          próximo proyecto
+          oportunidades
         </span>
       </h2>
 
@@ -1279,7 +1278,7 @@ function ContactSection() {
         transform: visible ? "translateY(0)" : "translateY(20px)",
         transition: "all 0.8s ease 0.3s",
       }}>
-        ¿Tienes un proyecto en mente o quieres colaborar? Siempre estoy abierto a discutir nuevas ideas y crear algo extraordinario juntos.
+        Estoy en búsqueda de nuevas oportunidades donde pueda aportar mis habilidades en análisis de datos, desarrollo web y gestión empresarial. Si tu equipo busca un perfil multidisciplinario, hablemos.
       </p>
 
       {/* Links */}
