@@ -331,6 +331,7 @@ function Navigation({ active }) {
   }, []);
 
   const links = [
+    { label: "Sobre Mí", id: "about" },
     { label: "Portafolio", id: "portfolio" },
     { label: "Tecnologías", id: "technologies" },
     { label: "Contacto", id: "contact" },
@@ -465,7 +466,7 @@ function Hero() {
         transition: "all 0.8s ease 1.8s",
       }}>
         <button
-          onClick={() => document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth" })}
+          onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}
           style={{
             position: "relative", padding: "16px 40px", borderRadius: 50,
             border: "none", cursor: "pointer",
@@ -488,7 +489,7 @@ function Hero() {
             e.currentTarget.style.transform = "translateY(0)";
           }}
         >
-          Ver Proyectos <ArrowRight size={15} />
+          Conoce mi perfil <ArrowRight size={15} />
         </button>
       </div>
 
@@ -509,12 +510,357 @@ function Hero() {
 }
 
 /* ═══════════════════════════════════════════════════════
+   ABOUT SECTION — Professional profile with animated
+   timeline, stats counter, and skill badges.
+   ═══════════════════════════════════════════════════════ */
+function AboutSection() {
+  const [ref, visible] = useReveal(0.05);
+  const [statsRef, statsVisible] = useStagger(4, 0.1);
+  const [expRef, expVisible] = useStagger(3, 0.08);
+  const [eduRef, eduVisible] = useStagger(4, 0.08);
+  const [toolsRef, toolsVisible] = useStagger(6, 0.06);
+
+  const stats = [
+    { num: "+3", label: "Años de experiencia" },
+    { num: "4", label: "Proyectos en producción" },
+    { num: "2", label: "Diplomas especializados" },
+    { num: "B2", label: "Inglés certificado" },
+  ];
+
+  const experience = [
+    {
+      role: "Analista de Cobranza",
+      company: "Proaktiva Financiera",
+      period: "2024 — 2025",
+      description: "Gestión y seguimiento de cartera vencida mediante análisis y explotación de bases de datos. Elaboración de reportes estratégicos, cargas masivas de información y administración de grandes volúmenes de datos.",
+      accent: "var(--amber)",
+    },
+    {
+      role: "Auditor Externo",
+      company: "Deloitte",
+      period: "2023 — 2024",
+      description: "Revisión de obligaciones ante IMSS e INFONAVIT, verificación de cumplimiento de prestaciones conforme a la LFT y análisis de pagos de PTU, garantizando apego normativo.",
+      accent: "var(--violet)",
+    },
+    {
+      role: "Inventarios",
+      company: "G-Global",
+      period: "2022",
+      description: "Control y optimización de procesos de almacenamiento y distribución. Coordinación en recepción y despacho de mercancía, manejo de documentación para exportación.",
+      accent: "var(--cyan)",
+    },
+  ];
+
+  const education = [
+    { title: "Ing. Desarrollo de Software", school: "Universidad Tecmilenio", year: "2025 — Cursando", accent: "var(--amber)" },
+    { title: "Diplomado Business Intelligence", school: "Cetys Universidad", year: "2025", accent: "var(--violet)" },
+    { title: "Diplomado Gestión Logística", school: "Universidad Vizcaya de las Américas", year: "2022", accent: "var(--cyan)" },
+    { title: "Lic. Admón. de Empresas", school: "Universidad Vizcaya de las Américas", year: "2018 — 2021", accent: "var(--rose)" },
+  ];
+
+  const tools = [
+    "Power BI", "SQL", "Excel Avanzado", "Google Looker Studio", "VBA / Macros", "Google Notebook",
+  ];
+
+  return (
+    <section id="about" style={{ padding: "100px 24px 60px", maxWidth: 1100, margin: "0 auto" }}>
+      {/* Section label */}
+      <div ref={ref} style={{
+        display: "flex", alignItems: "center", gap: 16, marginBottom: 16,
+        opacity: visible ? 1 : 0, transform: visible ? "translateX(0)" : "translateX(-30px)",
+        transition: "all 0.7s cubic-bezier(0.4,0,0.2,1)",
+      }}>
+        <span style={{
+          fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          color: "var(--amber)", letterSpacing: "0.1em",
+        }}>00</span>
+        <div style={{ width: 40, height: 1, background: "var(--amber)", opacity: 0.4 }} />
+        <span style={{
+          fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 500,
+          color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase",
+        }}>Perfil</span>
+      </div>
+
+      {/* Heading */}
+      <h2 style={{
+        fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900,
+        fontFamily: "'Outfit', sans-serif", color: "var(--text)",
+        margin: "0 0 12px", letterSpacing: "-0.03em", lineHeight: 1.1,
+        opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(40px)",
+        transition: "all 0.8s cubic-bezier(0.4,0,0.2,1) 0.1s",
+      }}>
+        Lic. Gerardo{" "}
+        <span style={{
+          background: "var(--gradient-1)", WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        }}>
+          Bejarano
+        </span>
+      </h2>
+
+      {/* Bio */}
+      <p style={{
+        fontSize: 15, color: "var(--text-dim)", fontFamily: "'Manrope', sans-serif",
+        lineHeight: 1.8, maxWidth: 620, margin: "0 0 48px",
+        opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)",
+        transition: "all 0.8s ease 0.25s",
+      }}>
+        Administrador de Empresas con formación en Ingeniería de Software, bases de datos y ciencia de datos. 
+        Integro la gestión empresarial con herramientas avanzadas para tomar decisiones basadas en datos, 
+        optimizar procesos y desarrollar soluciones digitales que generan impacto real.
+      </p>
+
+      {/* ── Stats Strip ────────────────────────────── */}
+      <div ref={statsRef} style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+        gap: 16, marginBottom: 64,
+      }}>
+        {stats.map((s, i) => (
+          <div key={s.label} style={{
+            padding: "24px 20px", borderRadius: 16,
+            background: "var(--surface)", border: "1px solid var(--border)",
+            textAlign: "center",
+            opacity: statsVisible.has(i) ? 1 : 0,
+            transform: statsVisible.has(i) ? "translateY(0) scale(1)" : "translateY(30px) scale(0.92)",
+            transition: `all 0.6s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.08}s`,
+          }}>
+            <div style={{
+              fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 900,
+              fontFamily: "'Outfit', sans-serif",
+              background: "var(--gradient-1)", WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              lineHeight: 1.2, marginBottom: 6,
+            }}>
+              {s.num}
+            </div>
+            <div style={{
+              fontSize: 11, color: "var(--text-dim)",
+              fontFamily: "'JetBrains Mono', monospace", fontWeight: 500,
+              letterSpacing: "0.04em",
+            }}>
+              {s.label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Experience Timeline ────────────────────── */}
+      <div style={{ marginBottom: 64 }}>
+        <h3 style={{
+          fontSize: 13, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          color: "var(--text-muted)", letterSpacing: "0.12em", textTransform: "uppercase",
+          marginBottom: 28,
+          opacity: visible ? 1 : 0, transition: "opacity 0.8s ease 0.4s",
+        }}>
+          Experiencia Laboral
+        </h3>
+        <div ref={expRef} style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          {experience.map((exp, i) => (
+            <ExperienceCard key={exp.role} exp={exp} index={i} visible={expVisible.has(i)} />
+          ))}
+        </div>
+      </div>
+
+      {/* ── Education Grid ─────────────────────────── */}
+      <div style={{ marginBottom: 64 }}>
+        <h3 style={{
+          fontSize: 13, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          color: "var(--text-muted)", letterSpacing: "0.12em", textTransform: "uppercase",
+          marginBottom: 28,
+          opacity: visible ? 1 : 0, transition: "opacity 0.8s ease 0.5s",
+        }}>
+          Formación Académica
+        </h3>
+        <div ref={eduRef} style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))",
+          gap: 12,
+        }}>
+          {education.map((edu, i) => (
+            <EducationCard key={edu.title} edu={edu} index={i} visible={eduVisible.has(i)} />
+          ))}
+        </div>
+      </div>
+
+      {/* ── Tools & Platforms ──────────────────────── */}
+      <div>
+        <h3 style={{
+          fontSize: 13, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          color: "var(--text-muted)", letterSpacing: "0.12em", textTransform: "uppercase",
+          marginBottom: 20,
+          opacity: visible ? 1 : 0, transition: "opacity 0.8s ease 0.6s",
+        }}>
+          Herramientas & Plataformas
+        </h3>
+        <div ref={toolsRef} style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+          {tools.map((tool, i) => (
+            <ToolBadge key={tool} name={tool} index={i} visible={toolsVisible.has(i)} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Experience Card — Timeline item with animated border ── */
+function ExperienceCard({ exp, index, visible }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "grid", gridTemplateColumns: "140px 1fr",
+        gap: "0 24px", padding: "28px 0",
+        borderBottom: "1px solid var(--border)",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateX(0)" : "translateX(-50px)",
+        transition: `all 0.7s cubic-bezier(0.4,0,0.2,1) ${index * 0.12}s`,
+        position: "relative",
+      }}
+    >
+      {/* Animated left accent line on hover */}
+      <div style={{
+        position: "absolute", left: -1, top: 0, bottom: 0, width: 2,
+        background: hovered ? exp.accent : "transparent",
+        transition: "background 0.4s ease",
+        borderRadius: 2,
+      }} />
+
+      {/* Left — period */}
+      <div style={{ paddingTop: 2 }}>
+        <span style={{
+          fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          color: hovered ? exp.accent : "var(--text-muted)",
+          transition: "color 0.3s",
+          letterSpacing: "0.03em",
+        }}>
+          {exp.period}
+        </span>
+      </div>
+
+      {/* Right — content */}
+      <div>
+        <h4 style={{
+          fontSize: 17, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+          color: "var(--text)", margin: "0 0 4px", letterSpacing: "-0.01em",
+        }}>
+          {exp.role}
+        </h4>
+        <span style={{
+          fontSize: 13, fontWeight: 600, fontFamily: "'Manrope', sans-serif",
+          color: hovered ? exp.accent : "var(--text-dim)",
+          transition: "color 0.3s", display: "block", marginBottom: 10,
+        }}>
+          {exp.company}
+        </span>
+        <p style={{
+          fontSize: 13, color: "var(--text-dim)", lineHeight: 1.7,
+          fontFamily: "'Manrope', sans-serif", margin: 0,
+        }}>
+          {exp.description}
+        </p>
+      </div>
+
+      {/* Mobile: stack layout */}
+      <style>{`
+        @media (max-width: 600px) {
+          div[style*="gridTemplateColumns: 140px"] {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+/* ── Education Card — Compact card with accent top border ── */
+function EducationCard({ edu, index, visible }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        padding: 1, borderRadius: 16,
+        background: hovered
+          ? `linear-gradient(135deg, ${edu.accent}, var(--violet))`
+          : "var(--border)",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.93)",
+        transition: `all 0.6s cubic-bezier(0.34,1.56,0.64,1) ${index * 0.1}s, background 0.4s`,
+        animation: hovered ? "rotateBorder 4s linear infinite" : "none",
+      }}
+    >
+      <div style={{
+        borderRadius: 15, padding: "22px 20px",
+        background: hovered ? "var(--surface-hover)" : "var(--surface)",
+        transition: "background 0.3s",
+        height: "100%",
+      }}>
+        <span style={{
+          fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          color: hovered ? edu.accent : "var(--text-muted)",
+          letterSpacing: "0.06em", transition: "color 0.3s",
+        }}>
+          {edu.year}
+        </span>
+        <h4 style={{
+          fontSize: 15, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+          color: "var(--text)", margin: "8px 0 4px", letterSpacing: "-0.01em",
+          lineHeight: 1.3,
+        }}>
+          {edu.title}
+        </h4>
+        <span style={{
+          fontSize: 12, color: "var(--text-dim)", fontFamily: "'Manrope', sans-serif",
+          fontWeight: 500,
+        }}>
+          {edu.school}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Tool Badge — Animated pill ── */
+function ToolBadge({ name, index, visible }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <span
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        padding: "10px 20px", borderRadius: 50,
+        fontSize: 12, fontWeight: 600,
+        fontFamily: "'JetBrains Mono', monospace",
+        color: hovered ? "var(--amber)" : "var(--text-dim)",
+        background: hovered ? "rgba(245,158,11,0.08)" : "var(--surface)",
+        border: `1px solid ${hovered ? "rgba(245,158,11,0.25)" : "var(--border)"}`,
+        cursor: "default",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(20px)",
+        transition: `all 0.5s cubic-bezier(0.34,1.56,0.64,1) ${index * 0.07}s, color 0.25s, background 0.25s, border-color 0.25s`,
+        letterSpacing: "0.04em",
+      }}
+    >
+      {name}
+    </span>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
    MARQUEE — infinite scrolling text strip
    Creates visual rhythm between sections
    ═══════════════════════════════════════════════════════ */
 function Marquee() {
   const [ref, visible] = useReveal(0.1);
-  const text = "FRONTEND · BACKEND · UI/UX · E-COMMERCE · SAAS · WEB APPS · API · ";
+  const text = "FRONTEND · BACKEND · UI/UX · E-COMMERCE · SAAS · WEB APPS · DATA ANALYTICS · BUSINESS INTELLIGENCE · ";
   return (
     <div ref={ref} style={{
       overflow: "hidden", padding: "28px 0",
@@ -1189,7 +1535,7 @@ export default function App() {
   const mouse = useMouse();
 
   useEffect(() => {
-    const ids = ["portfolio", "technologies", "contact"];
+    const ids = ["about", "portfolio", "technologies", "contact"];
     const obs = new IntersectionObserver(
       (entries) => entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); }),
       { threshold: 0.3 }
@@ -1212,6 +1558,7 @@ export default function App() {
       <main style={{ position: "relative", zIndex: 1 }}>
         <Hero />
         <Marquee />
+        <AboutSection />
         <PortfolioSection />
         <TechnologiesSection />
         <ContactSection />
