@@ -235,30 +235,40 @@ function useStagger(count, threshold = 0.08) {
   return [ref, items];
 }
 
-function useMouse() {
-  const pos = useRef({ x: 0, y: 0 });
-  const [, forceUpdate] = useState(0);
-  useEffect(() => {
-    let ticking = false;
-    const handler = (e) => {
-      pos.current = { x: e.clientX, y: e.clientY };
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(() => { forceUpdate(n => n + 1); ticking = false; });
-      }
-    };
-    window.addEventListener("mousemove", handler, { passive: true });
-    return () => window.removeEventListener("mousemove", handler);
-  }, []);
-  return pos.current;
-}
-
 /* ═══════════════════════════════════════════════════════
    AURORA BACKGROUND + GRAIN
    Multi-layered animated gradient background with
    film grain overlay for texture.
    ═══════════════════════════════════════════════════════ */
-function AuroraBackground({ mouse }) {
+function AuroraBackground() {
+  const spotRef = useRef(null);
+  const target = useRef({ x: 0, y: 0 });
+  const current = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouse = (e) => {
+      target.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener("mousemove", handleMouse, { passive: true });
+
+    let raf;
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const animate = () => {
+      current.current.x = lerp(current.current.x, target.current.x, 0.12);
+      current.current.y = lerp(current.current.y, target.current.y, 0.12);
+      if (spotRef.current) {
+        spotRef.current.style.transform = `translate(${current.current.x - 350}px, ${current.current.y - 350}px)`;
+      }
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouse);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
       {/* Aurora gradients */}
@@ -272,18 +282,20 @@ function AuroraBackground({ mouse }) {
         animation: "aurora 20s ease-in-out infinite",
         backgroundSize: "200% 200%, 200% 200%, 200% 200%",
       }} />
-      {/* Mouse-following spotlight */}
-      <div style={{
-        position: "absolute",
-        left: mouse.x - 300,
-        top: mouse.y - 300,
-        width: 600,
-        height: 600,
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(139,92,246,0.08) 0%, rgba(245,158,11,0.04) 40%, transparent 70%)",
-        transition: "left 0.3s ease-out, top 0.3s ease-out",
-        willChange: "left, top",
-      }} />
+      {/* Mouse-following spotlight — smooth lerp via RAF */}
+      <div
+        ref={spotRef}
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: 700,
+          height: 700,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(139,92,246,0.35) 0%, rgba(245,158,11,0.20) 30%, rgba(6,182,212,0.10) 50%, transparent 70%)",
+          willChange: "transform",
+        }}
+      />
       {/* Grain overlay */}
       <div style={{
         position: "absolute", inset: "-200%", opacity: 0.025,
@@ -992,7 +1004,7 @@ function ProjectCard({ project, index }) {
 
         {/* Description */}
         <p style={{
-          fontSize: 14, color: "var(--text-dim)", lineHeight: 1.7,
+          fontSize: 14, color: "#c4c4d4", lineHeight: 1.7,
           fontFamily: "'Manrope', sans-serif", margin: "0 0 24px",
         }}>
           {project.description}
@@ -1531,7 +1543,6 @@ function Footer() {
    ═══════════════════════════════════════════════════════ */
 export default function App() {
   const [active, setActive] = useState("portfolio");
-  const mouse = useMouse();
 
   useEffect(() => {
     const ids = ["about", "portfolio", "technologies", "contact"];
@@ -1549,7 +1560,7 @@ export default function App() {
       fontFamily: "'Manrope', sans-serif", overflowX: "hidden", position: "relative",
     }}>
       <style>{GLOBAL_CSS}</style>
-      <AuroraBackground mouse={mouse} />
+      <AuroraBackground />
       <ScrollProgress />
       <Navigation active={active} />
       <BrandMark />
