@@ -75,6 +75,10 @@ const GLOBAL_CSS = `
   }
 
   /* ── Pulse ring ─────────────────────────────── */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
   @keyframes pulseRing {
     0% { transform: scale(1); opacity: 0.4; }
     100% { transform: scale(2.5); opacity: 0; }
@@ -135,43 +139,34 @@ const GLOBAL_CSS = `
 const PROJECTS = [
   {
     id: 1,
-    title: "NorthServices MXL",
-    description: "Landing page promocional para un SaaS enfocado en clínicas y consultorios médicos. Facilita la gestión de citas, pacientes, facturación y administración integral del consultorio.",
-    tags: ["React", "Tailwind CSS", "Landing Page", "SaaS"],
+    title: "Logic — Credit Portfolio Platform",
+    description: "Plataforma interna de gestión de cartera crediticia en producción. Motor financiero M4 con proyección día a día, clasificación IFRS9 automática, reportes exportables (XLSX/PDF), notificaciones vía Gmail API, tipo de cambio Banxico en tiempo real, y LogicBot — asistente IA con tool calls sobre Anthropic API. 563 tests automatizados, seguridad JWT, roles granulares y PWA instalable.",
+    tags: ["Next.js", "NestJS", "PostgreSQL", "TypeScript", "Anthropic API", "PWA"],
     accent: "var(--amber)",
-    year: "2022",
-    link: "https://northservicesmxl.netlify.app",
+    year: "2026",
+    link: "https://logiclandingpage-production.up.railway.app/",
     num: "01",
+    featured: true,
   },
   {
     id: 2,
+    title: "NorthServices MXL",
+    description: "Landing page promocional para un SaaS enfocado en clínicas y consultorios médicos. Facilita la gestión de citas, pacientes, facturación y administración integral del consultorio.",
+    tags: ["React", "Tailwind CSS", "Landing Page", "SaaS"],
+    accent: "var(--violet)",
+    year: "2022",
+    link: "https://northservicesmxl.netlify.app",
+    num: "02",
+  },
+  {
+    id: 3,
     title: "Rising Bakery",
     description: "E-commerce completo para una pastelería con carrito de compras, pasarelas de pago (tarjeta y OXXO), diseño de pasteles personalizados, gestión de pedidos y catálogo dinámico.",
     tags: ["React", "Node.js", "Stripe", "Pasarelas de Pago", "E-commerce"],
     accent: "var(--rose)",
     year: "2024",
     link: "https://risingbakery-production.up.railway.app/",
-    num: "02",
-  },
-  {
-    id: 3,
-    title: "Office Bros",
-    description: "Videojuego estilo 32-bit basado en una financiera donde enfrentas enemigos que representan instituciones de autoridad. Incluye múltiples niveles, mecánicas de combate y una narrativa satírica del sistema financiero.",
-    tags: ["JavaScript", "Canvas", "Game Dev", "Pixel Art", "32-bit"],
-    accent: "var(--violet)",
-    year: "2025",
-    link: "https://proaktivabros-production.up.railway.app/",
     num: "03",
-  },
-  {
-    id: 4,
-    title: "COSMOS — Solar System Explorer",
-    description: "Visualizador interactivo de rotación planetaria que simula los movimientos orbitales de los planetas alrededor del Sol, permitiendo entender la proporción de velocidad de cada uno en tiempo real.",
-    tags: ["Three.js", "WebGL", "3D", "Simulación", "Astronomía"],
-    accent: "var(--cyan)",
-    year: "2023",
-    link: "https://planetshow-production.up.railway.app/",
-    num: "04",
   },
 ];
 
@@ -185,13 +180,10 @@ const TECHNOLOGIES = [
   { name: "Three.js", cat: "3D", icon: "🌐" },
   { name: "GraphQL", cat: "API", icon: "◈" },
   { name: "Docker", cat: "DevOps", icon: "🐳" },
-  { name: "Figma", cat: "Diseño", icon: "🎯" },
   { name: "Python", cat: "Lenguaje", icon: "🐍" },
-  { name: "AWS", cat: "Nube", icon: "☁" },
   { name: "Git", cat: "Control", icon: "⑂" },
   { name: "Redis", cat: "Caché", icon: "⚡" },
   { name: "Vite", cat: "Build", icon: "⚡" },
-  { name: "Stripe", cat: "Pagos", icon: "💳" },
 ];
 
 /* ═══════════════════════════════════════════════════════
@@ -534,7 +526,7 @@ function AboutSection() {
 
   const stats = [
     { num: "+3", label: "Años de experiencia" },
-    { num: "4", label: "Proyectos en producción" },
+    { num: "3", label: "Proyectos en producción" },
     { num: "2", label: "Diplomas especializados" },
     { num: "B2", label: "Inglés certificado" },
   ];
@@ -906,6 +898,7 @@ function ProjectCard({ project, index }) {
   const [visible, setVisible] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const isFeatured = project.featured;
 
   useEffect(() => {
     const el = ref.current;
@@ -935,11 +928,11 @@ function ProjectCard({ project, index }) {
       onMouseLeave={() => setHovered(false)}
       onClick={() => project.link && window.open(project.link, "_blank", "noopener,noreferrer")}
       style={{
-        position: "relative", borderRadius: 24, padding: 1,
-        background: hovered
-          ? `conic-gradient(from var(--angle), ${project.accent}, var(--violet), ${project.accent})`
+        position: "relative", borderRadius: 24, padding: isFeatured ? 2 : 1,
+        background: (hovered || isFeatured)
+          ? `conic-gradient(from var(--angle), ${project.accent}, var(--violet), var(--rose), ${project.accent})`
           : "var(--border)",
-        animation: hovered ? "rotateBorder 3s linear infinite" : "none",
+        animation: (hovered || isFeatured) ? "rotateBorder 3s linear infinite" : "none",
         opacity: visible ? 1 : 0,
         transform: visible
           ? `translateY(0) scale(${hovered ? 1.02 : 1})`
@@ -948,22 +941,50 @@ function ProjectCard({ project, index }) {
           ? "transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.6s ease, background 0.4s"
           : `all 0.8s cubic-bezier(0.4,0,0.2,1) ${index * 0.15}s`,
         cursor: project.link ? "pointer" : "default",
+        boxShadow: isFeatured
+          ? `0 0 40px rgba(245,158,11,0.08), 0 0 80px rgba(139,92,246,0.05)`
+          : "none",
       }}
     >
       {/* Inner card with glass effect */}
       <div style={{
-        borderRadius: 23, padding: "36px 32px",
+        borderRadius: isFeatured ? 22 : 23, padding: isFeatured ? "40px 36px" : "36px 32px",
         background: hovered
           ? `radial-gradient(ellipse at ${mousePos.x}% ${mousePos.y}%, rgba(255,255,255,0.04), var(--surface))`
           : "var(--surface)",
         transition: "background 0.3s ease",
         position: "relative", overflow: "hidden",
       }}>
+        {/* Featured badge */}
+        {isFeatured && (
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            padding: "6px 14px", borderRadius: 50, marginBottom: 20,
+            background: "linear-gradient(135deg, rgba(245,158,11,0.12), rgba(139,92,246,0.12))",
+            border: "1px solid rgba(245,158,11,0.15)",
+          }}>
+            <span style={{
+              width: 6, height: 6, borderRadius: "50%", background: "var(--amber)",
+              boxShadow: "0 0 8px rgba(245,158,11,0.6)",
+              animation: "pulse 2s ease-in-out infinite",
+            }} />
+            <span style={{
+              fontSize: 10, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700,
+              letterSpacing: "0.12em", textTransform: "uppercase",
+              background: "var(--gradient-1)", WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>
+              Proyecto Destacado · En Producción
+            </span>
+          </div>
+        )}
+
         {/* Number + year header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <span style={{
-            fontSize: 48, fontWeight: 900, fontFamily: "'Outfit', sans-serif",
-            color: "rgba(255,255,255,0.03)", lineHeight: 1, letterSpacing: "-0.04em",
+            fontSize: isFeatured ? 56 : 48, fontWeight: 900, fontFamily: "'Outfit', sans-serif",
+            color: isFeatured ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
+            lineHeight: 1, letterSpacing: "-0.04em",
           }}>
             {project.num}
           </span>
@@ -1097,13 +1118,26 @@ function PortfolioSection() {
       {/* Project grid */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 460px), 1fr))",
+        gridTemplateColumns: "repeat(2, 1fr)",
         gap: 20,
       }}>
         {PROJECTS.map((p, i) => (
-          <ProjectCard key={p.id} project={p} index={i} />
+          <div key={p.id} style={{
+            gridColumn: p.featured ? "1 / -1" : "auto",
+          }}>
+            <ProjectCard project={p} index={i} />
+          </div>
         ))}
       </div>
+
+      {/* Responsive override */}
+      <style>{`
+        @media (max-width: 768px) {
+          #portfolio > div:last-child {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
