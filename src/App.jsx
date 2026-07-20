@@ -556,7 +556,8 @@ function AboutSection() {
   ];
 
   const education = [
-    { title: "Certificación en Gestión de Proyectos", school: "IBM", year: "2025", accent: "var(--amber)" },
+    { title: "Certificado Profesional de Gestor de Proyectos", school: "IBM", year: "2026", accent: "var(--amber)" },
+    { title: "Certificado Profesional de Ciberseguridad", school: "Google", year: "2026", accent: "var(--amber)" },
     { title: "Diplomado Business Intelligence", school: "Cetys Universidad", year: "2025", accent: "var(--amber)" },
     { title: "Diplomado Gestión Logística", school: "Universidad Vizcaya de las Américas", year: "2022", accent: "var(--cyan)" },
     { title: "Lic. Admón. de Empresas", school: "Universidad Vizcaya de las Américas", year: "2018 — 2021", accent: "var(--rose)" },
