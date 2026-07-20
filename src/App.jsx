@@ -535,7 +535,7 @@ function AboutSection() {
     {
       role: "Analista de Cobranza",
       company: "Proaktiva Financiera",
-      period: "2024 — 2025",
+      period: "2024 — Actualidad",
       description: "Gestión y seguimiento de cartera vencida mediante análisis y explotación de bases de datos. Elaboración de reportes estratégicos, cargas masivas de información y administración de grandes volúmenes de datos.",
       accent: "var(--amber)",
     },
@@ -556,6 +556,7 @@ function AboutSection() {
   ];
 
   const education = [
+    { title: "Certificación en Gestión de Proyectos", school: "IBM", year: "2025", accent: "var(--amber)" },
     { title: "Diplomado Business Intelligence", school: "Cetys Universidad", year: "2025", accent: "var(--amber)" },
     { title: "Diplomado Gestión Logística", school: "Universidad Vizcaya de las Américas", year: "2022", accent: "var(--cyan)" },
     { title: "Lic. Admón. de Empresas", school: "Universidad Vizcaya de las Américas", year: "2018 — 2021", accent: "var(--rose)" },
@@ -996,7 +997,7 @@ function ProjectCard({ project, index }) {
                 fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
                 letterSpacing: "0.06em", textTransform: "uppercase",
               }}>
-                EN VIVO
+                EN PRODUCCIÓN
               </span>
             )}
             <span style={{
